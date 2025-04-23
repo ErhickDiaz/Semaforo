@@ -1,0 +1,89 @@
+plate,latitude,longitude,datetime,speed,azimuth,odometer,hourmeter,provider,geofences
+PJJV29,-32.891904,-70.821676,2025-04-16T22:18:36+00:00,96.3,307,837663.8,629.1627777777778,transportes_san_gabriel,[]
+SVLV52,-33.590804,-71.58378,2025-04-16T22:10:40+00:00,0.0,324,290852.4,865.1897222222223,transportes_san_gabriel,"[{'name': 'D&C ', 'category': 'Transportes San Gabriel'}]"
+PZDJ66,-35.83129,-71.640978,2025-04-16T22:15:57+00:00,0.0,180,497016.0,7107.751666666667,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+KZXJ72,-25.407056,-69.972657,2025-04-16T22:18:36+00:00,37.8,210,1231107.1,2602.9891666666667,transportes_san_gabriel,[]
+LXHJ99,-33.324773,-70.712684,2025-04-16T22:12:11+00:00,0.0,318,1067344.0,2101.001111111111,transportes_san_gabriel,"[{'name': 'CD IDEAL', 'category': 'Clientes'}]"
+PZDJ55,-35.525853,-71.488692,2025-04-16T22:17:40+00:00,0.0,86,403201.4,472.9013888888889,transportes_san_gabriel,"[{'name': 'Taller Externo', 'category': 'Transportes San Gabriel'}]"
+LZRG89,-33.324551,-70.712404,2025-04-16T22:08:48+00:00,0.0,259,800436,2428.5916666666667,transportes_san_gabriel,"[{'name': 'CD IDEAL', 'category': 'Clientes'}]"
+PSLY21,-35.841329,-71.635993,2025-04-16T22:11:31+00:00,0.0,1,606635,2844.1027777777776,transportes_san_gabriel,[]
+PGBY32,-35.020581,-71.247148,2025-04-16T22:18:33+00:00,6.8,358,974861.3,2487.6091666666666,transportes_san_gabriel,[]
+RHDX20,-36.634024,-72.189243,2025-04-16T22:13:57+00:00,0.0,56,444241,1925.7352777777778,transportes_san_gabriel,[]
+PFBS17,-35.831166,-71.641109,2025-03-21T22:22:12+00:00,0.0,7,944095.0,1515.0297222222223,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PZDJ70,-33.387848,-70.763618,2025-04-16T22:12:09+00:00,0.0,0,46246.8,791.1361111111111,transportes_san_gabriel,[]
+LXHJ98,-36.849578,-72.322577,2025-04-16T22:18:34+00:00,0.0,0,1118459.4,2647.3063888888887,transportes_san_gabriel,[]
+PWZH34,-38.685911,-72.523396,2025-04-16T22:14:59+00:00,0.0,199,50738.3,978.5719444444444,transportes_san_gabriel,"[{'name': 'ICB Temuco', 'category': 'Transportes San Gabriel'}, {'name': 'IDEAL_TEMUCO', 'category': 'Transportes San Gabriel'}]"
+LTGY82,-33.324698,-70.712839,2025-04-16T22:13:57+00:00,0.0,166,2071170.0,1982.1552777777779,transportes_san_gabriel,"[{'name': 'CD IDEAL', 'category': 'Clientes'}]"
+LTGY83,-35.832005,-71.640471,2025-04-16T22:15:07+00:00,0.0,13,1069550.6,2384.21,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+KBLZ46,-26.340934,-70.62022,2025-04-16T22:18:39+00:00,6.2,232,1168862.4,3656.9538888888887,transportes_san_gabriel,[]
+SPVR14E,,,,,,,,transportes_san_gabriel,[]
+PSLY27,-35.839076,-71.648207,2025-04-16T22:16:07+00:00,0.0,15,875331.9,2581.1619444444445,transportes_san_gabriel,"[{'name': 'Taller SG', 'category': 'Transportes San Gabriel'}]"
+JJWG93,-35.485126,-71.660667,2025-04-16T22:12:10+00:00,0.0,292,1107346,2088.426111111111,transportes_san_gabriel,"[{'name': 'IDEAL_TALCA', 'category': 'Transportes San Gabriel'}]"
+PFBS13,-35.838967,-71.647984,2025-04-16T22:13:37+00:00,0.0,77,928683.2,2473.4375,transportes_san_gabriel,"[{'name': 'Taller SG', 'category': 'Transportes San Gabriel'}]"
+RFZY94,-33.59158,-71.58366,2025-04-16T22:13:48+00:00,0.0,267,100947.4,1973.3561111111112,transportes_san_gabriel,"[{'name': 'D&C ', 'category': 'Transportes San Gabriel'}]"
+PFBS11,-35.417692,-71.632897,2025-03-26T17:07:22+00:00,0.0,28,1036343.9,1167.4175,transportes_san_gabriel,[]
+RFZY95,-33.324708,-70.714069,2025-04-16T22:16:27+00:00,0.0,69,433808,1804.5975,transportes_san_gabriel,"[{'name': 'CD IDEAL', 'category': 'Clientes'}]"
+RFZY96,-35.831015,-71.640531,2025-04-16T22:16:04+00:00,0.0,59,458064,1964.6922222222222,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PWZH32,-35.13262,-71.353005,2025-04-16T22:18:32+00:00,85.0,232,68566.0,923.7647222222222,transportes_san_gabriel,[]
+SSRT52,-33.667235,-70.911392,2025-04-16T22:18:40+00:00,86.6,55,266221.9,1372.9322222222222,transportes_san_gabriel,[]
+JJWG66,-35.831967,-71.640598,2025-04-16T22:12:22+00:00,0.0,268,1249628.3,1030.9930555555557,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+LCTB55,-35.830611,-71.640689,2025-04-16T22:18:37+00:00,7.0,4,2076328.7,2277.34,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PFBS18,-35.830958,-71.641136,2025-04-14T18:30:23+00:00,0.0,355,903470,2101.5363888888887,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+RFZY97,-35.831547,-71.641199,2025-04-16T22:11:58+00:00,0.0,139,533622.7,1926.395,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PJJV11,-36.192511,-71.828309,2025-04-16T22:18:32+00:00,91.9,180,1015591.3,2232.505833333333,transportes_san_gabriel,[]
+PZDJ65,-35.832455,-71.641653,2025-04-16T22:16:33+00:00,0.0,2,443976.6,3266.5844444444447,transportes_san_gabriel,[]
+RHDX19,-35.831138,-71.640963,2025-04-16T22:16:36+00:00,0.0,6,395,1928.056388888889,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PJJV10,-35.417166,-71.632414,2025-04-15T19:05:11+00:00,0.0,0,896004.9,0,transportes_san_gabriel,[]
+PZDJ88,,,,,,,,transportes_san_gabriel,[]
+RFZY93,-33.338719,-70.717221,2025-04-16T22:18:16+00:00,0.0,340,405211,2049.6133333333332,transportes_san_gabriel,"[{'name': 'Planta ABI', 'category': 'Transportes San Gabriel'}]"
+LTGY85,-30.885761,-71.606843,2025-04-16T22:18:34+00:00,88.8,44,984198,2363.744722222222,transportes_san_gabriel,[]
+PFBS12,-23.623138,-70.393555,2025-04-16T22:18:12+00:00,0.0,67,890185,1681.701388888889,transportes_san_gabriel,[]
+PSLY20,-33.324726,-70.712606,2025-04-16T22:15:19+00:00,0.0,29,820034.4,2614.4925,transportes_san_gabriel,"[{'name': 'CD IDEAL', 'category': 'Clientes'}]"
+KBLZ47,-36.203038,-71.824292,2025-04-16T22:18:34+00:00,85.4,160,153320.0,2303.587777777778,transportes_san_gabriel,[]
+RHDX18,-35.831991,-71.640221,2025-04-16T22:11:06+00:00,0.0,180,377224,2249.235,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PCLZ42,-35.838857,-71.648182,2025-04-16T22:14:12+00:00,0.0,85,469901.9,1789.4361111111111,transportes_san_gabriel,"[{'name': 'Taller SG', 'category': 'Transportes San Gabriel'}]"
+PSLY22,-35.832074,-71.640418,2025-04-16T22:14:38+00:00,0.0,304,732131.8,2198.2072222222223,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+LTGY86,-35.831922,-71.640214,2025-04-16T22:14:56+00:00,0.0,89,935737,2641.7644444444445,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+SVLV46B,,,,,,,,transportes_san_gabriel,[]
+PFBS16,-36.651572,-72.227979,2025-03-20T18:50:20+00:00,0.0,222,932275.5,1444.3430555555556,transportes_san_gabriel,[]
+KZPW51,-25.195442,-69.866252,2025-04-16T22:18:40+00:00,86.3,23,1192667.3,2514.946388888889,transportes_san_gabriel,[]
+PFBS15,-36.651939,-72.227434,2025-03-20T21:58:17+00:00,0.0,136,997602.4,1711.5527777777777,transportes_san_gabriel,[]
+PGKD18,-37.782758,-72.295662,2025-04-16T22:11:54+00:00,0.0,189,958128.3,2506.4375,transportes_san_gabriel,[]
+PGKD17,-35.831905,-71.640141,2025-04-16T22:09:25+00:00,0.0,92,961835.0,2233.825,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+TBGH39,-35.838874,-71.648074,2025-04-16T22:18:38+00:00,0.0,101,345087.3,1630.77,transportes_san_gabriel,"[{'name': 'Taller SG', 'category': 'Transportes San Gabriel'}]"
+PCLZ41,-35.607221,-71.591511,2025-04-16T22:18:08+00:00,0.0,314,503961.5,2613.7741666666666,transportes_san_gabriel,"[{'name': 'CMPC', 'category': 'Transportes San Gabriel'}]"
+RFZY98,-33.328584,-70.724348,2025-04-16T22:14:42+00:00,0.0,166,414313,1948.4205555555557,transportes_san_gabriel,[]
+RFZY99,-29.291928,-71.033804,2025-04-16T21:57:58+00:00,87.1,170,547093.7,2154.2294444444447,transportes_san_gabriel,[]
+PZDJ58,-36.311053,-71.832413,2025-04-16T22:18:36+00:00,81.9,200,413367.1,1423.1625,transportes_san_gabriel,[]
+SVLV53,-37.13779,-72.387282,2025-04-16T22:18:31+00:00,89.7,5,173333.2,164908.4922222222,transportes_san_gabriel,[]
+TRZC66,-34.210445,-70.76988,2025-04-16T22:16:55+00:00,0.0,298,19847.4,645.2338888888889,transportes_san_gabriel,[]
+PCLZ40,-33.591198,-71.583761,2025-04-16T22:11:50+00:00,0.0,321,538860.8,2806.9130555555557,transportes_san_gabriel,"[{'name': 'D&C ', 'category': 'Transportes San Gabriel'}]"
+PZDJ63,-35.83179,-71.641608,2025-04-16T17:37:12+00:00,0.0,183,4208808.4,144.31,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+SVLV55,-38.136181,-72.31993,2025-04-16T22:18:38+00:00,90.1,316,278525.2,363.0130555555556,transportes_san_gabriel,[]
+SPVR14,-39.4955,-72.808109,2025-04-16T21:58:28+00:00,86.1,166,45384.5,7698.968333333333,transportes_san_gabriel,[]
+SVLV55E,,,,,,,,transportes_san_gabriel,[]
+SVLV46,-36.438335,-71.959545,2025-04-16T22:18:34+00:00,89.6,55,37493.7,1765.2611111111112,transportes_san_gabriel,[]
+PJKT53,-38.237695,-72.349525,2025-04-16T22:18:41+00:00,39.1,272,500486.5,2822.6058333333335,transportes_san_gabriel,[]
+PCLZ43,-35.831182,-71.64114,2025-04-16T22:12:33+00:00,0.0,29,506613.7,2715.4011111111113,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PZDJ87,-35.831393,-71.640999,2025-04-16T22:11:32+00:00,0.0,94,485199.9,2624.9538888888887,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PZDJ56,-39.285526,-71.951009,2025-04-16T22:09:02+00:00,0.0,276,118171.4,2207.6566666666668,transportes_san_gabriel,[]
+PZDJ57,-35.830224,-71.64159,2025-04-16T22:15:16+00:00,0.0,187,506861.4,2353.255,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PZDJ85,-33.337183,-70.715659,2025-04-16T22:13:00+00:00,0.1,4,448157.8,2039.7972222222222,transportes_san_gabriel,"[{'name': 'Planta ABI', 'category': 'Transportes San Gabriel'}]"
+PJKT44,-35.831872,-71.641784,2025-04-16T22:14:05+00:00,0.0,185,392230.3,1184.4619444444445,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PJKT50,-35.838768,-71.647897,2025-04-09T22:56:40+00:00,0.0,203,481343.0,2388.9055555555556,transportes_san_gabriel,"[{'name': 'Taller SG', 'category': 'Transportes San Gabriel'}]"
+PJKT54,-35.831361,-71.640948,2025-04-16T22:16:21+00:00,0.0,100,501005.3,2748.595,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PJKT52,-33.335417,-70.696741,2025-04-16T22:18:34+00:00,2.5,156,115317.5,2057.5691666666667,transportes_san_gabriel,[]
+PZDJ61,-34.218707,-71.403672,2025-04-16T22:18:34+00:00,61.8,353,470319.2,2385.2463888888888,transportes_san_gabriel,"[{'name': 'Ruta de la Fruta ', 'category': ''}]"
+PJKT42,-35.043011,-71.266875,2025-04-16T22:18:40+00:00,80.8,239,423002.8,1958.6555555555556,transportes_san_gabriel,[]
+PZDJ83,-38.735094,-72.642402,2025-04-16T22:12:37+00:00,0.0,343,465012.1,2369.9016666666666,transportes_san_gabriel,[]
+PZDJ67,-33.60069,-70.60571,2025-04-16T22:18:32+00:00,66.0,340,545459.3,2739.3905555555557,transportes_san_gabriel,[]
+PZDJ86,-35.691302,-71.686408,2025-04-16T22:18:36+00:00,83.3,349,498475.2,2616.1675,transportes_san_gabriel,[]
+PZDJ84,-35.839003,-71.648016,2025-04-16T22:16:35+00:00,0.0,144,490927.3,2111.6625,transportes_san_gabriel,"[{'name': 'Taller SG', 'category': 'Transportes San Gabriel'}]"
+PZDJ89,-33.589778,-71.585503,2025-04-16T22:18:26+00:00,0.0,328,440369.9,2175.0427777777777,transportes_san_gabriel,"[{'name': 'D&C ', 'category': 'Transportes San Gabriel'}]"
+PZDJ68,-36.645724,-72.216893,2025-04-16T22:18:42+00:00,87.1,49,621558.0,3017.4377777777777,transportes_san_gabriel,"[{'name': 'Itata ruta ', 'category': ''}]"
+PCLZ36,-33.388069,-70.763119,2025-04-16T22:16:01+00:00,0.0,113,392845.2,1005.3666666666667,transportes_san_gabriel,[]
+PZDJ60,,,,,,,,transportes_san_gabriel,[]
+PJKT43,-34.219618,-71.403422,2025-04-16T22:18:38+00:00,62.7,343,502684.3,2128.4625,transportes_san_gabriel,"[{'name': 'Ruta de la Fruta ', 'category': ''}]"
+PZDJ69,-35.831741,-71.641737,2025-04-16T22:10:02+00:00,0.0,178,561735.3,3275.5597222222223,transportes_san_gabriel,"[{'name': 'Planta San Gabriel', 'category': 'Transportes San Gabriel'}]"
+PJKT51,-33.728637,-70.73154,2025-04-16T22:18:42+00:00,75.2,204,446497.5,2174.2561111111113,transportes_san_gabriel,[]
+SVLV56,-34.828475,-71.082994,2025-04-16T22:18:36+00:00,73.5,247,278608.3,1011.235,transportes_san_gabriel,[]

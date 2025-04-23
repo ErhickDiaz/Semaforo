@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel Torre de Transportes</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.5rem;
+    }
+    th {
+      color: #FFD700;
+      text-align: left;
+      padding: 10px;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #444;
+    }
+    .verde { color: #00ff00; }
+    .amarillo { color: #ffff00; }
+    .rojo { color: #ff4c4c; }
+    #reloj {
+      font-size: 2rem;
+      position: absolute;
+      top: 20px;
+      right: 40px;
+    }
+    #filtros {
+      margin-bottom: 20px;
+    }
+    .boton-filtro {
+      background-color: #333;
+      border: 1px solid #555;
+      color: white;
+      padding: 8px 15px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .boton-filtro:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div id="reloj"></div>
+
+  <div id="filtros"></div>
+
+  <table id="panel">
+    <thead>
+      <tr>
+        <th>Transporte</th>
+        <th>Ruta</th>
+        <th>Hora Salida</th>
+        <th>ETA</th>
+        <th>Semáforo</th>
+        <th>Última Actualización</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function actualizarReloj() {
+      const ahora = new Date();
+      const hora = ahora.getHours().toString().padStart(2, '0');
+      const minutos = ahora.getMinutes().toString().padStart(2, '0');
+      document.getElementById('reloj').textContent = `${hora}:${minutos}`;
+    }
+
+    setInterval(actualizarReloj, 1000);
+    actualizarReloj();
+
+    function obtenerColor(estado) {
+      estado = estado.toLowerCase();
+      if (estado.includes("retrasado")) return "rojo";
+      if (estado.includes("desvío")) return "amarillo";
+      return "verde";
+    }
+
+    let datosOriginales = [];
+
+    function mostrarFilas(datos) {
+      const tbody = document.querySelector('#panel tbody');
+      tbody.innerHTML = '';
+      datos.forEach(cols => {
+        const estadoColor = obtenerColor(cols[4]);
+        const tr = `
+          <tr>
+            <td>${cols[0]}</td>
+            <td>${cols[1]}</td>
+            <td>${cols[2]}</td>
+            <td>${cols[3]}</td>
+            <td class="${estadoColor}">${cols[4]}</td>
+            <td>${cols[5]}</td>
+          </tr>`;
+        tbody.innerHTML += tr;
+      });
+    }
+
+    function crearBotonesFiltro(rutasUnicas) {
+      const contenedor = document.getElementById('filtros');
+      contenedor.innerHTML = '';
+
+      const botonTodos = document.createElement('button');
+      botonTodos.textContent = 'Mostrar Todos';
+      botonTodos.className = 'boton-filtro';
+      botonTodos.onclick = () => mostrarFilas(datosOriginales);
+      contenedor.appendChild(botonTodos);
+
+      rutasUnicas.forEach(ruta => {
+        const boton = document.createElement('button');
+        boton.textContent = ruta;
+        boton.className = 'boton-filtro';
+        boton.onclick = () => {
+          const filtrado = datosOriginales.filter(cols => cols[1] === ruta);
+          mostrarFilas(filtrado);
+        };
+        contenedor.appendChild(boton);
+      });
+    }
+
+    async function cargarDatos() {
+      const response = await fetch('viajes.csv');
+      const data = await response.text();
+      const filas = data.trim().split('\n').slice(1);
+      datosOriginales = filas.map(fila => fila.split(','));
+
+      const rutas = [...new Set(datosOriginales.map(cols => cols[1]))];
+      crearBotonesFiltro(rutas);
+      mostrarFilas(datosOriginales);
+    }
+
+    cargarDatos();
+    setInterval(cargarDatos, 600000);
+  </script>
+</body>
+</html>
