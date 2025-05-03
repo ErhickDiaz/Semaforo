@@ -58,10 +58,10 @@
   <table id="panel">
     <thead>
       <tr>
-        <th>Transporte</th>
+        <th>Patente</th>
         <th>Ruta</th>
-        <th>Hora Salida</th>
-        <th>ETA</th>
+        <th>Hora Carga</th>
+        <th>Hora Llegada</th>
         <th>Semáforo</th>
         <th>Última Actualización</th>
       </tr>
@@ -82,46 +82,44 @@
 
     function obtenerColor(estado) {
       estado = estado.toLowerCase();
-      if (estado.includes("retrasado")) return "rojo";
-      if (estado.includes("desvío")) return "amarillo";
-      return "verde";
+      if (estado === "rojo") return "rojo";
+      if (estado === "amarillo") return "amarillo";
+      if (estado === "verde") return "verde";
+      if (estado === "sin iniciar") return "amarillo";
+      return "blanco";
     }
 
     let datosOriginales = [];
     let rutas = [];
-    let patentesAsignadas = [];
 
-    function calcularEstadoSemaforo(viaje, ruta) {
-      const horaActual = new Date();
+    function calcularEstadoSemaforo(ruta) {
+      const ahora = new Date();
       const horaCarga = new Date(ruta.hora_carga);
       const horaLlegada = new Date(ruta.hora_llegada);
-      const margenAmarillo = 30 * 60 * 1000;  // 30 minutos en milisegundos
+      const margen = 30 * 60 * 1000; // 30 minutos en ms
 
-      if (horaActual < horaCarga) {
-        return "No ha comenzado";
-      } else if (horaActual >= horaCarga && horaActual <= horaLlegada) {
-        return "Verde";
-      } else if (horaActual > horaLlegada && horaActual <= horaLlegada + margenAmarillo) {
-        return "Amarillo";
-      } else {
-        return "Rojo";
-      }
+      if (ahora < horaCarga) return "sin iniciar";
+      if (ahora >= horaCarga && ahora <= horaLlegada) return "verde";
+      if (ahora > horaLlegada && ahora <= new Date(horaLlegada.getTime() + margen)) return "amarillo";
+      return "rojo";
     }
 
     function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
       datos.forEach(cols => {
-        const ruta = rutas.find(r => r.origen === cols[1] && r.destino === cols[2]);
-        const estadoSemaforo = calcularEstadoSemaforo(cols, ruta);
+        const patente = cols[0];
+        const ruta = rutas.find(r => r.patente === patente);
+        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : "sin datos";
+
         const tr = `
           <tr>
-            <td>${cols[0]}</td>
-            <td>${cols[1]}</td>
-            <td>${cols[2]}</td>
-            <td>${cols[3]}</td>
+            <td>${patente}</td>
+            <td>${cols[1]} → ${cols[2]}</td>
+            <td>${ruta ? ruta.hora_carga : "-"}</td>
+            <td>${ruta ? ruta.hora_llegada : "-"}</td>
             <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
-            <td>${cols[5]}</td>
+            <td>${cols[4]}</td>
           </tr>`;
         tbody.innerHTML += tr;
       });
@@ -141,7 +139,7 @@
       botonAsignados.textContent = 'Mostrar Asignados';
       botonAsignados.className = 'boton-filtro';
       botonAsignados.onclick = () => {
-        const filtrado = datosOriginales.filter(cols => patentesAsignadas.includes(cols[0]));
+        const filtrado = datosOriginales.filter(cols => cols[0] && rutas.some(r => r.patente === cols[0]));
         mostrarFilas(filtrado);
       };
       contenedor.appendChild(botonAsignados);
@@ -169,8 +167,13 @@
       const filasRutas = dataRutas.trim().split('\n').slice(1);
       rutas = filasRutas.map(fila => {
         const cols = fila.split(',');
-        patentesAsignadas.push(cols[0]);  // Guardamos las patentes asignadas
-        return { origen: cols[1], destino: cols[2], hora_carga: cols[3], hora_llegada: cols[4] };
+        return {
+          patente: cols[0],
+          hora_carga: cols[1],
+          origen: cols[2],
+          hora_llegada: cols[3],
+          destino: cols[4]
+        };
       });
 
       const rutasUnicas = [...new Set(datosOriginales.map(cols => cols[1]))];
@@ -179,7 +182,7 @@
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 600000);
+    setInterval(cargarDatos, 600000); // cada 10 min
   </script>
 </body>
 </html>
