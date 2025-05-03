@@ -160,4 +160,26 @@
 
     async function cargarDatos() {
       const responseViajes = await fetch('viajes.csv');
-      const dataViajes
+      const dataViajes = await responseViajes.text();
+      const filasViajes = dataViajes.trim().split('\n').slice(1);
+      datosOriginales = filasViajes.map(fila => fila.split(','));
+
+      const responseRutas = await fetch('ruta.csv');
+      const dataRutas = await responseRutas.text();
+      const filasRutas = dataRutas.trim().split('\n').slice(1);
+      rutas = filasRutas.map(fila => {
+        const cols = fila.split(',');
+        patentesAsignadas.push(cols[0]);  // Guardamos las patentes asignadas
+        return { origen: cols[1], destino: cols[2], hora_carga: cols[3], hora_llegada: cols[4] };
+      });
+
+      const rutasUnicas = [...new Set(datosOriginales.map(cols => cols[1]))];
+      crearBotonesFiltro(rutasUnicas);
+      mostrarFilas(datosOriginales);
+    }
+
+    cargarDatos();
+    setInterval(cargarDatos, 600000);
+  </script>
+</body>
+</html>
