@@ -88,19 +88,38 @@
     }
 
     let datosOriginales = [];
+    let rutas = [];
+
+    function calcularEstadoSemaforo(viaje, ruta) {
+      const horaActual = new Date();
+      const horaCarga = new Date(ruta.hora_carga);
+      const horaLlegada = new Date(ruta.hora_llegada);
+      const margenAmarillo = 30 * 60 * 1000;  // 30 minutos en milisegundos
+
+      if (horaActual < horaCarga) {
+        return "No ha comenzado";
+      } else if (horaActual >= horaCarga && horaActual <= horaLlegada) {
+        return "Verde";
+      } else if (horaActual > horaLlegada && horaActual <= horaLlegada + margenAmarillo) {
+        return "Amarillo";
+      } else {
+        return "Rojo";
+      }
+    }
 
     function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
       datos.forEach(cols => {
-        const estadoColor = obtenerColor(cols[4]);
+        const ruta = rutas.find(r => r.origen === cols[1] && r.destino === cols[2]);
+        const estadoSemaforo = calcularEstadoSemaforo(cols, ruta);
         const tr = `
           <tr>
             <td>${cols[0]}</td>
             <td>${cols[1]}</td>
             <td>${cols[2]}</td>
             <td>${cols[3]}</td>
-            <td class="${estadoColor}">${cols[4]}</td>
+            <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
             <td>${cols[5]}</td>
           </tr>`;
         tbody.innerHTML += tr;
@@ -130,13 +149,21 @@
     }
 
     async function cargarDatos() {
-      const response = await fetch('viajes.csv');
-      const data = await response.text();
-      const filas = data.trim().split('\n').slice(1);
-      datosOriginales = filas.map(fila => fila.split(','));
+      const responseViajes = await fetch('viajes.csv');
+      const dataViajes = await responseViajes.text();
+      const filasViajes = dataViajes.trim().split('\n').slice(1);
+      datosOriginales = filasViajes.map(fila => fila.split(','));
 
-      const rutas = [...new Set(datosOriginales.map(cols => cols[1]))];
-      crearBotonesFiltro(rutas);
+      const responseRutas = await fetch('ruta.csv');
+      const dataRutas = await responseRutas.text();
+      const filasRutas = dataRutas.trim().split('\n').slice(1);
+      rutas = filasRutas.map(fila => {
+        const cols = fila.split(',');
+        return { origen: cols[0], destino: cols[1], hora_carga: cols[2], hora_llegada: cols[3] };
+      });
+
+      const rutasUnicas = [...new Set(datosOriginales.map(cols => cols[1]))];
+      crearBotonesFiltro(rutasUnicas);
       mostrarFilas(datosOriginales);
     }
 
