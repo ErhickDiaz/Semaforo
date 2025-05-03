@@ -89,6 +89,7 @@
 
     let datosOriginales = [];
     let rutas = [];
+    let patentesAsignadas = [];
 
     function calcularEstadoSemaforo(viaje, ruta) {
       const horaActual = new Date();
@@ -136,6 +137,15 @@
       botonTodos.onclick = () => mostrarFilas(datosOriginales);
       contenedor.appendChild(botonTodos);
 
+      const botonAsignados = document.createElement('button');
+      botonAsignados.textContent = 'Mostrar Asignados';
+      botonAsignados.className = 'boton-filtro';
+      botonAsignados.onclick = () => {
+        const filtrado = datosOriginales.filter(cols => patentesAsignadas.includes(cols[0]));
+        mostrarFilas(filtrado);
+      };
+      contenedor.appendChild(botonAsignados);
+
       rutasUnicas.forEach(ruta => {
         const boton = document.createElement('button');
         boton.textContent = ruta;
@@ -150,25 +160,4 @@
 
     async function cargarDatos() {
       const responseViajes = await fetch('viajes.csv');
-      const dataViajes = await responseViajes.text();
-      const filasViajes = dataViajes.trim().split('\n').slice(1);
-      datosOriginales = filasViajes.map(fila => fila.split(','));
-
-      const responseRutas = await fetch('ruta.csv');
-      const dataRutas = await responseRutas.text();
-      const filasRutas = dataRutas.trim().split('\n').slice(1);
-      rutas = filasRutas.map(fila => {
-        const cols = fila.split(',');
-        return { origen: cols[0], destino: cols[1], hora_carga: cols[2], hora_llegada: cols[3] };
-      });
-
-      const rutasUnicas = [...new Set(datosOriginales.map(cols => cols[1]))];
-      crearBotonesFiltro(rutasUnicas);
-      mostrarFilas(datosOriginales);
-    }
-
-    cargarDatos();
-    setInterval(cargarDatos, 600000);
-  </script>
-</body>
-</html>
+      const dataViajes
