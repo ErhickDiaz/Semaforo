@@ -1,4 +1,4 @@
-patente,hora_carga,origen_geocerca,hora_llegada,destino_geocerca
+Transporte,hora_carga,origen_geocerca,hora_llegada,destino_geocerca
 LXHJ98,03/05/2025 10:00,CD IDEAL,04/05/2025 23:00,IDEAL_LOS ANGELES
 PGKD18,03/05/2025 08:00,CD IDEAL,04/05/2025 21:00,IDEAL_ANTOFAGASTA
 LCTB55,03/05/2025 08:00,CD IDEAL,04/05/2025 23:00,IDEAL_TALCA
