@@ -48,6 +48,11 @@
     .boton-filtro:hover {
       background-color: #555;
     }
+    .fecha-actualizacion {
+      text-align: right;
+      font-family: monospace;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
@@ -119,7 +124,7 @@
             <td>${ruta ? ruta.hora_carga : "-"}</td>
             <td>${ruta ? ruta.hora_llegada : "-"}</td>
             <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
-            <td>${cols[4]}</td>
+            <td class="fecha-actualizacion">${cols[4]}</td>
           </tr>`;
         tbody.innerHTML += tr;
       });
