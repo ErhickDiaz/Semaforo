@@ -1,21 +1,21 @@
 Transporte,Ruta,Hora Salida,ETA,Semáforo,Última Actualización,Latitud,Longitud
-PJJV29,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.830771,-71.641608
-SVLV52,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.217207,-71.418186
+PJJV29,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.821042,-71.641961
+SVLV52,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.349896,-71.575251
 PZDJ66,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831044,-71.641248
-KZXJ72,Fuera de zona,,,Fuera de zona,Formato erróneo,-31.422275,-71.569772
+KZXJ72,Fuera de zona,,,Fuera de zona,Formato erróneo,-31.5717,-71.53819
 LXHJ99,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831972,-71.640228
-PZDJ55,Fuera de zona,,,Fuera de zona,Formato erróneo,-38.519225,-72.456274
-LZRG89,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.57502,-71.702656
+PZDJ55,Fuera de zona,,,Fuera de zona,Formato erróneo,-38.362882,-72.385923
+LZRG89,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.417783,-71.631293
 PSLY21,CD IDEAL,,,En tránsito,Formato erróneo,-33.324629,-70.712786
-PGBY32,Fuera de zona,,,Fuera de zona,Formato erróneo,-24.209723,-70.119766
+PGBY32,Fuera de zona,,,Fuera de zona,Formato erróneo,-24.058254,-70.242925
 RHDX20,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831172,-71.641226
 PFBS17,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.830982,-71.641089
 PZDJ70,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.388096,-70.763272
 LXHJ98,CD IDEAL,,,En tránsito,Formato erróneo,-33.324265,-70.712899
-PWZH34,Fuera de zona,,,Fuera de zona,Formato erróneo,-31.093298,-71.604304
+PWZH34,Fuera de zona,,,Fuera de zona,Formato erróneo,-31.224587,-71.599628
 LTGY82,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831832,-71.640195
-LTGY83,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.539138,-70.946347
-KBLZ46,Fuera de zona,,,Fuera de zona,Formato erróneo,-37.64966,-72.275691
+LTGY83,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.692222,-71.016348
+KBLZ46,Fuera de zona,,,Fuera de zona,Formato erróneo,-37.812147,-72.338781
 SPVR14E,Fuera de zona,,,Sin señal,No disponible,,
 PSLY27,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.84123,-71.635884
 JJWG93,CD IDEAL,,,En tránsito,Formato erróneo,-33.324319,-70.71247
@@ -26,7 +26,7 @@ RFZY95,Planta ABI,,,En tránsito,Formato erróneo,-33.337121,-70.715598
 RFZY96,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831231,-71.641081
 PWZH32,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831665,-71.641657
 SSRT52,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831441,-71.64092
-JJWG66,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.529537,-70.706028
+JJWG66,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.70363,-70.722821
 LCTB55,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831792,-71.640399
 PFBS18,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831077,-71.641342
 RFZY97,Fuera de zona,,,Fuera de zona,Formato erróneo,-23.792791,-70.316298
@@ -36,24 +36,24 @@ RHDX19,Fuera de zona,,,Fuera de zona,Formato erróneo,-29.058386,-70.905431
 PJJV10,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.417628,-71.63284
 PZDJ88,Fuera de zona,,,Sin señal,No disponible,,
 RFZY93,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831569,-71.640656
-LTGY85,Fuera de zona,,,Fuera de zona,Formato erróneo,-32.598494,-71.243888
+LTGY85,Fuera de zona,,,Fuera de zona,Formato erróneo,-32.790366,-71.16558
 PFBS12,Fuera de zona,,,Fuera de zona,Formato erróneo,-36.766261,-73.011128
 PSLY20,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.328505,-70.724442
 KBLZ47,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.436176,-71.637292
-RHDX18,Fuera de zona,,,Fuera de zona,Formato erróneo,-31.092929,-71.604336
+RHDX18,Fuera de zona,,,Fuera de zona,Formato erróneo,-31.224078,-71.59977
 PCLZ42,Fuera de zona,,,Fuera de zona,Formato erróneo,-41.457704,-72.958476
-PSLY22,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.965343,-71.194632
+PSLY22,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.09594,-71.32025
 LTGY86,CD IDEAL,,,En tránsito,Formato erróneo,-33.324577,-70.712866
-PFBS16,Fuera de zona,,,Fuera de zona,Formato erróneo,-28.788145,-70.783387
-KZPW51,IDEAL_ANTOFAGASTA,,,En tránsito,Formato erróneo,-23.619407,-70.3888
+PFBS16,Fuera de zona,,,Fuera de zona,Formato erróneo,-28.561184,-70.778603
+KZPW51,IDEAL_ANTOFAGASTA,,,En tránsito,Formato erróneo,-23.619423,-70.388764
 PFBS15,Fuera de zona,,,Fuera de zona,Formato erróneo,-36.651939,-72.227434
 PGKD18,IDEAL_LOS VILOS,,,En tránsito,Formato erróneo,-31.897966,-71.489933
-PGKD17,Fuera de zona,,,Fuera de zona,Formato erróneo,-29.791586,-71.30082
-TBGH39,Fuera de zona,,,Fuera de zona,Formato erróneo,-36.410046,-71.944883
+PGKD17,Fuera de zona,,,Fuera de zona,Formato erróneo,-29.6134,-71.274458
+TBGH39,Fuera de zona,,,Fuera de zona,Formato erróneo,-36.490343,-72.026323
 PCLZ41,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831395,-71.641003
-RFZY98,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.878781,-71.14585
+RFZY98,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.039027,-71.258764
 RFZY99,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.83094,-71.640902
-PZDJ58,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.442503,-70.890501
+PZDJ58,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.592266,-70.970962
 SVLV53,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.595641,-71.589981
 TRZC66,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.210493,-70.770014
 PCLZ40,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831094,-71.64119
@@ -61,28 +61,28 @@ PZDJ63,ICB,,,En tránsito,Formato erróneo,-33.333106,-70.697083
 SVLV55,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.8302,-71.641569
 SPVR14,CMPC,,,En tránsito,Formato erróneo,-35.607477,-71.591071
 SVLV55E,Fuera de zona,,,Sin señal,No disponible,,
-SVLV46,CMPC,,,En tránsito,Formato erróneo,-35.607887,-71.590836
-PJKT53,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.832537,-71.641028
-PCLZ43,Fuera de zona,,,Fuera de zona,Formato erróneo,-41.426964,-72.956323
+SVLV46,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.60856,-71.591459
+PJKT53,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.832383,-71.641012
+PCLZ43,Fuera de zona,,,Fuera de zona,Formato erróneo,-41.42622,-72.955652
 PZDJ87,Taller Externo,,,En tránsito,Formato erróneo,-35.525693,-71.489229
 PZDJ56,Taller Externo,,,En tránsito,Formato erróneo,-35.525703,-71.488972
 PZDJ57,ICB,,,En tránsito,Formato erróneo,-33.333337,-70.696908
-PZDJ85,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.622985,-70.714739
+PZDJ85,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.792925,-70.746891
 PJKT44,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831262,-71.640976
 PJKT50,Taller SG,,,En tránsito,Formato erróneo,-35.839084,-71.648219
-PJKT54,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.150497,-71.374154
+PJKT54,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.261542,-71.4863
 PJKT52,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.388502,-70.762256
-PZDJ61,Fuera de zona,,,Fuera de zona,Formato erróneo,-39.376164,-72.651384
-PJKT42,Fuera de zona,,,Fuera de zona,Formato erróneo,-41.245329,-73.035139
+PZDJ61,Fuera de zona,,,Fuera de zona,Formato erróneo,-39.266192,-72.556728
+PJKT42,Fuera de zona,,,Fuera de zona,Formato erróneo,-41.075617,-73.085893
 PZDJ83,Fuera de zona,,,Fuera de zona,Formato erróneo,-37.546782,-72.309262
 PZDJ67,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831407,-71.641001
-PZDJ86,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.521333,-71.677059
+PZDJ86,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.649511,-71.695727
 PZDJ84,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831304,-71.640961
-PZDJ89,Fuera de zona,,,Fuera de zona,Formato erróneo,-36.112838,-71.801144
+PZDJ89,Fuera de zona,,,Fuera de zona,Formato erróneo,-35.965183,-71.689437
 PZDJ68,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831192,-71.640942
 PCLZ36,Fuera de zona,,,Fuera de zona,Formato erróneo,-33.387694,-70.763661
 PZDJ60,Fuera de zona,,,Sin señal,No disponible,,
 PJKT43,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831798,-71.641842
-PZDJ69,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.594956,-70.973389
+PZDJ69,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.744918,-71.041007
 PJKT51,Planta San Gabriel,,,En tránsito,Formato erróneo,-35.831221,-71.640969
-SVLV56,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.991886,-71.228407
+SVLV56,Fuera de zona,,,Fuera de zona,Formato erróneo,-34.961303,-71.19143
