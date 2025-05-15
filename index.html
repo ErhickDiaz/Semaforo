@@ -11,18 +11,19 @@
       padding: 20px;
     }
     table {
-      width: 100%;
+      width: 80%;
+      margin: 0 auto;
       border-collapse: collapse;
       font-size: 1.5rem;
+      text-align: center;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #444;
+      text-align: center;
     }
     th {
       color: #FFD700;
-      text-align: left;
-      padding: 10px;
-    }
-    td {
-      padding: 10px;
-      border-bottom: 1px solid #444;
     }
     .verde { color: #00ff00; }
     .amarillo { color: #ffff00; }
@@ -35,6 +36,7 @@
     }
     #filtros {
       margin-bottom: 20px;
+      text-align: center;
     }
     .boton-filtro {
       background-color: #333;
@@ -49,7 +51,6 @@
       background-color: #555;
     }
     .fecha-actualizacion {
-      text-align: right;
       font-family: monospace;
       color: #aaa;
     }
@@ -87,13 +88,10 @@
 
     function obtenerColor(estado) {
       estado = estado.toLowerCase();
-
-      if (estado.includes("fuera de zona")) return "rojo";
-      if (estado.includes("taller") || estado.includes("en tránsito")) return "amarillo";
-      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
+      if (estado === "rojo") return "rojo";
+      if (estado === "amarillo") return "amarillo";
+      if (estado === "verde") return "verde";
       if (estado === "sin iniciar") return "amarillo";
-      if (estado === "sin datos") return "rojo";
-
       return "blanco";
     }
 
@@ -101,6 +99,8 @@
     let rutas = [];
 
     function calcularEstadoSemaforo(ruta) {
+      if (!ruta.hora_carga || !ruta.hora_llegada) return "sin datos";
+
       const ahora = new Date();
       const horaCarga = new Date(ruta.hora_carga);
       const horaLlegada = new Date(ruta.hora_llegada);
@@ -118,16 +118,18 @@
       datos.forEach(cols => {
         const patente = cols[0];
         const ruta = rutas.find(r => r.patente === patente);
-        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : (cols[4] || "sin datos");
+        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : "sin datos";
+
+        const ultimaActualizacion = cols[5] ? cols[5] : (cols[4] ? cols[4] : '-');
 
         const tr = `
           <tr>
             <td>${patente}</td>
-            <td>${cols[1]} → ${ruta ? ruta.destino : '-'}</td>
-            <td>${ruta ? ruta.hora_carga : '-'}</td>
-            <td>${ruta ? ruta.hora_llegada : '-'}</td>
+            <td>${cols[1]} → ${cols[2] ? cols[2] : ''}</td>
+            <td>${ruta ? ruta.hora_carga : "-"}</td>
+            <td>${ruta ? ruta.hora_llegada : "-"}</td>
             <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
-            <td class="fecha-actualizacion">${cols[5] || '-'}</td>
+            <td class="fecha-actualizacion">${ultimaActualizacion}</td>
           </tr>`;
         tbody.innerHTML += tr;
       });
@@ -190,7 +192,7 @@
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 600000); // cada 10 minutos
+    setInterval(cargarDatos, 600000); // cada 10 min
   </script>
 </body>
 </html>
