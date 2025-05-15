@@ -2,50 +2,64 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel de Viajes</title>
+  <title>Panel Torre de Transportes</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      background-color: #111;
+      color: white;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
     }
-    #panel {
+    table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      font-size: 1.5rem;
     }
-    #panel th, #panel td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      /* Por defecto alineamos a la izquierda */
+    th {
+      color: #FFD700;
       text-align: left;
+      padding: 10px;
     }
-    /* Centrar solo la columna Última Actualización (última columna) */
-    #panel th:last-child,
-    #panel td:last-child {
-      text-align: center;
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #444;
     }
-    #panel th {
-      background-color: #f2f2f2;
+    .verde { color: #00ff00; }
+    .amarillo { color: #ffff00; }
+    .rojo { color: #ff4c4c; }
+    #reloj {
+      font-size: 2rem;
+      position: absolute;
+      top: 20px;
+      right: 40px;
     }
-    /* Para el semáforo si quieres colores */
-    .semaforo-verde {
-      color: green;
-      font-weight: bold;
+    #filtros {
+      margin-bottom: 20px;
     }
-    .semaforo-rojo {
-      color: red;
-      font-weight: bold;
+    .boton-filtro {
+      background-color: #333;
+      border: 1px solid #555;
+      color: white;
+      padding: 8px 15px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 1rem;
     }
-    .semaforo-amarillo {
-      color: orange;
-      font-weight: bold;
+    .boton-filtro:hover {
+      background-color: #555;
+    }
+    .fecha-actualizacion {
+      text-align: right;
+      font-family: monospace;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <h1>Panel de Viajes</h1>
+  <div id="reloj"></div>
+
+  <div id="filtros"></div>
+
   <table id="panel">
     <thead>
       <tr>
@@ -57,56 +71,126 @@
         <th>Última Actualización</th>
       </tr>
     </thead>
-    <tbody id="table-body">
-      <!-- Filas serán cargadas con JavaScript -->
-    </tbody>
+    <tbody></tbody>
   </table>
 
   <script>
-    // Supongamos que tienes un archivo viajes.json con datos similares:
-    // Aquí pondremos un ejemplo con datos estáticos, reemplaza con fetch si lo tienes en servidor
+    function actualizarReloj() {
+      const ahora = new Date();
+      const hora = ahora.getHours().toString().padStart(2, '0');
+      const minutos = ahora.getMinutes().toString().padStart(2, '0');
+      document.getElementById('reloj').textContent = `${hora}:${minutos}`;
+    }
 
-    const datosViajes = [
-      {
-        patente: "PJJV29",
-        ruta: "Fuera de zona →",
-        horaCarga: "-",
-        horaLlegada: "-",
-        semaforo: "sin datos",
-        ultimaActualizacion: "05-15 01:26"
-      },
-      {
-        patente: "SVLV52",
-        ruta: "Fuera de zona →",
-        horaCarga: "-",
-        horaLlegada: "-",
-        semaforo: "sin datos",
-        ultimaActualizacion: "05-15 01:28"
-      }
-      // ... agrega más objetos según tus datos reales
-    ];
+    setInterval(actualizarReloj, 1000);
+    actualizarReloj();
 
-    function cargarTabla() {
-      const tbody = document.getElementById('table-body');
-      tbody.innerHTML = ''; // Limpiar tabla antes
+    function obtenerColor(estado) {
+      estado = estado.toLowerCase();
 
-      datosViajes.forEach((viaje) => {
-        const tr = document.createElement('tr');
+      if (estado.includes("fuera de zona")) return "rojo";
+      if (estado.includes("taller") || estado.includes("en tránsito")) return "amarillo";
+      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
+      if (estado === "sin iniciar") return "amarillo";
+      if (estado === "sin datos") return "rojo";
 
-        tr.innerHTML = `
-          <td>${viaje.patente}</td>
-          <td>${viaje.ruta}</td>
-          <td>${viaje.horaCarga}</td>
-          <td>${viaje.horaLlegada}</td>
-          <td>${viaje.semaforo}</td>
-          <td>${viaje.ultimaActualizacion}</td>
-        `;
+      return "blanco";
+    }
 
-        tbody.appendChild(tr);
+    let datosOriginales = [];
+    let rutas = [];
+
+    function calcularEstadoSemaforo(ruta) {
+      const ahora = new Date();
+      const horaCarga = new Date(ruta.hora_carga);
+      const horaLlegada = new Date(ruta.hora_llegada);
+      const margen = 30 * 60 * 1000; // 30 minutos en ms
+
+      if (ahora < horaCarga) return "sin iniciar";
+      if (ahora >= horaCarga && ahora <= horaLlegada) return "verde";
+      if (ahora > horaLlegada && ahora <= new Date(horaLlegada.getTime() + margen)) return "amarillo";
+      return "rojo";
+    }
+
+    function mostrarFilas(datos) {
+      const tbody = document.querySelector('#panel tbody');
+      tbody.innerHTML = '';
+      datos.forEach(cols => {
+        const patente = cols[0];
+        const ruta = rutas.find(r => r.patente === patente);
+        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : (cols[4] || "sin datos");
+
+        const tr = `
+          <tr>
+            <td>${patente}</td>
+            <td>${cols[1]} → ${ruta ? ruta.destino : '-'}</td>
+            <td>${ruta ? ruta.hora_carga : '-'}</td>
+            <td>${ruta ? ruta.hora_llegada : '-'}</td>
+            <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
+            <td class="fecha-actualizacion">${cols[5] || '-'}</td>
+          </tr>`;
+        tbody.innerHTML += tr;
       });
     }
 
-    window.onload = cargarTabla;
+    function crearBotonesFiltro(rutasUnicas) {
+      const contenedor = document.getElementById('filtros');
+      contenedor.innerHTML = '';
+
+      const botonTodos = document.createElement('button');
+      botonTodos.textContent = 'Mostrar Todos';
+      botonTodos.className = 'boton-filtro';
+      botonTodos.onclick = () => mostrarFilas(datosOriginales);
+      contenedor.appendChild(botonTodos);
+
+      const botonAsignados = document.createElement('button');
+      botonAsignados.textContent = 'Mostrar Asignados';
+      botonAsignados.className = 'boton-filtro';
+      botonAsignados.onclick = () => {
+        const filtrado = datosOriginales.filter(cols => cols[0] && rutas.some(r => r.patente === cols[0]));
+        mostrarFilas(filtrado);
+      };
+      contenedor.appendChild(botonAsignados);
+
+      rutasUnicas.forEach(ruta => {
+        const boton = document.createElement('button');
+        boton.textContent = ruta;
+        boton.className = 'boton-filtro';
+        boton.onclick = () => {
+          const filtrado = datosOriginales.filter(cols => cols[1] === ruta);
+          mostrarFilas(filtrado);
+        };
+        contenedor.appendChild(boton);
+      });
+    }
+
+    async function cargarDatos() {
+      const responseViajes = await fetch('viajes.csv');
+      const dataViajes = await responseViajes.text();
+      const filasViajes = dataViajes.trim().split('\n').slice(1);
+      datosOriginales = filasViajes.map(fila => fila.split(','));
+
+      const responseRutas = await fetch('ruta.csv');
+      const dataRutas = await responseRutas.text();
+      const filasRutas = dataRutas.trim().split('\n').slice(1);
+      rutas = filasRutas.map(fila => {
+        const cols = fila.split(',');
+        return {
+          patente: cols[0],
+          hora_carga: cols[1],
+          origen: cols[2],
+          hora_llegada: cols[3],
+          destino: cols[4]
+        };
+      });
+
+      const rutasUnicas = [...new Set(datosOriginales.map(cols => cols[1]))];
+      crearBotonesFiltro(rutasUnicas);
+      mostrarFilas(datosOriginales);
+    }
+
+    cargarDatos();
+    setInterval(cargarDatos, 600000); // cada 10 minutos
   </script>
 </body>
 </html>
