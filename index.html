@@ -87,10 +87,13 @@
 
     function obtenerColor(estado) {
       estado = estado.toLowerCase();
-      if (estado === "rojo") return "rojo";
-      if (estado === "amarillo") return "amarillo";
-      if (estado === "verde") return "verde";
+
+      if (estado.includes("fuera de zona")) return "rojo";
+      if (estado.includes("taller") || estado.includes("en tránsito")) return "amarillo";
+      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
       if (estado === "sin iniciar") return "amarillo";
+      if (estado === "sin datos") return "rojo";
+
       return "blanco";
     }
 
@@ -115,16 +118,16 @@
       datos.forEach(cols => {
         const patente = cols[0];
         const ruta = rutas.find(r => r.patente === patente);
-        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : "sin datos";
+        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : (cols[4] || "sin datos");
 
         const tr = `
           <tr>
             <td>${patente}</td>
-            <td>${cols[1]} → ${cols[2]}</td>
-            <td>${ruta ? ruta.hora_carga : "-"}</td>
-            <td>${ruta ? ruta.hora_llegada : "-"}</td>
+            <td>${cols[1]} → ${ruta ? ruta.destino : '-'}</td>
+            <td>${ruta ? ruta.hora_carga : '-'}</td>
+            <td>${ruta ? ruta.hora_llegada : '-'}</td>
             <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
-            <td class="fecha-actualizacion">${cols[4]}</td>
+            <td class="fecha-actualizacion">${cols[5] || '-'}</td>
           </tr>`;
         tbody.innerHTML += tr;
       });
@@ -187,7 +190,7 @@
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 600000); // cada 10 min
+    setInterval(cargarDatos, 600000); // cada 10 minutos
   </script>
 </body>
 </html>
