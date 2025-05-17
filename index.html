@@ -79,7 +79,6 @@
   </table>
 
   <script>
-    // Actualiza el reloj en pantalla
     function actualizarReloj() {
       const ahora = new Date();
       const hora = ahora.getHours().toString().padStart(2, '0');
@@ -89,62 +88,37 @@
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
 
-    // Función para asignar color según estado
+    let datosOriginales = [];
+    let rutas = [];
+    let asignados = [];
+
     function obtenerColor(estado) {
       estado = estado.toLowerCase();
       if (estado.includes("fuera de zona")) return "rojo";
-      if (estado.includes("taller") || estado.includes("en tránsito") || estado === "despacho" || estado === "retorno") return "amarillo";
+      if (estado.includes("taller") || estado.includes("en tránsito")) return "amarillo";
       if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
       if (estado === "sin iniciar") return "amarillo";
       if (estado === "sin datos") return "rojo";
       return "blanco";
     }
 
-    // Variables globales para datos
-    let datosOriginales = [];
-    let rutas = [];
-
-    // Calcular estado semáforo en base a horarios
-    function calcularEstadoSemaforo(ruta) {
-      const ahora = new Date();
-      const horaCarga = new Date(ruta.hora_carga);
-      const horaLlegada = new Date(ruta.hora_llegada);
-      const margen = 30 * 60 * 1000; // 30 minutos en ms
-
-      if (ahora < horaCarga) return "Sin iniciar";
-      if (ahora >= horaCarga && ahora <= horaLlegada) return "En tránsito";
-      if (ahora > horaLlegada && ahora <= new Date(horaLlegada.getTime() + margen)) return "Despacho";
-      return "Retorno";
-    }
-
-    // Mostrar filas en la tabla
     function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
       datos.forEach(cols => {
-        const patente = cols[0];
-        const ruta = rutas.find(r => r.transporte === patente);
-        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : (cols[4] || "Sin datos");
-
-        const origen = ruta ? ruta.origen_geocerca : '-';
-        const destino = ruta ? ruta.destino_geocerca : '-';
-        const horaCarga = ruta ? ruta.hora_carga : '-';
-        const horaLlegada = ruta ? ruta.hora_llegada : '-';
-
         const tr = `
           <tr>
-            <td>${patente}</td>
-            <td>${origen} → ${destino}</td>
-            <td>${horaCarga}</td>
-            <td>${horaLlegada}</td>
-            <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
+            <td>${cols[0]}</td>
+            <td>${cols[1]}</td>
+            <td>${cols[2] || '-'}</td>
+            <td>${cols[3] || '-'}</td>
+            <td class="${obtenerColor(cols[4] || 'sin datos')}">${cols[4] || 'Sin datos'}</td>
             <td class="fecha-actualizacion">${cols[5] || '-'}</td>
           </tr>`;
         tbody.innerHTML += tr;
       });
     }
 
-    // Crear botones filtro incluyendo los nuevos filtros
     function crearBotonesFiltro() {
       const contenedor = document.getElementById('filtros');
       contenedor.innerHTML = '';
@@ -161,58 +135,59 @@
       botonAsignados.textContent = 'Mostrar Asignados';
       botonAsignados.className = 'boton-filtro';
       botonAsignados.onclick = () => {
-        const filtrado = datosOriginales.filter(cols => cols[0] && rutas.some(r => r.transporte === cols[0]));
+        const filtrado = datosOriginales.filter(cols => asignados.includes(cols[0]));
         mostrarFilas(filtrado);
       };
       contenedor.appendChild(botonAsignados);
 
-      // Filtro Despacho (estado = "Despacho")
+      // Despacho
       const botonDespacho = document.createElement('button');
       botonDespacho.textContent = 'Despacho';
       botonDespacho.className = 'boton-filtro';
       botonDespacho.onclick = () => {
         const filtrado = datosOriginales.filter(cols => {
-          const patente = cols[0];
-          const ruta = rutas.find(r => r.transporte === patente);
-          if (!ruta) return false;
-          const estado = calcularEstadoSemaforo(ruta);
-          return estado === "Despacho";
+          // Busca patente en rutas con origen que no sea vacío (o que indique despacho)
+          return rutas.some(r => r.transporte === cols[0] && r.origen_geocerca && r.origen_geocerca.trim() !== '');
         });
         mostrarFilas(filtrado);
       };
       contenedor.appendChild(botonDespacho);
 
-      // Filtro Retorno (estado = "Retorno")
+      // Retorno
       const botonRetorno = document.createElement('button');
       botonRetorno.textContent = 'Retorno';
       botonRetorno.className = 'boton-filtro';
       botonRetorno.onclick = () => {
         const filtrado = datosOriginales.filter(cols => {
-          const patente = cols[0];
-          const ruta = rutas.find(r => r.transporte === patente);
-          if (!ruta) return false;
-          const estado = calcularEstadoSemaforo(ruta);
-          return estado === "Retorno";
+          // Busca patente en rutas con destino que no sea vacío (o que indique retorno)
+          return rutas.some(r => r.transporte === cols[0] && r.destino_geocerca && r.destino_geocerca.trim() !== '');
         });
         mostrarFilas(filtrado);
       };
       contenedor.appendChild(botonRetorno);
     }
 
-    // Cargar datos viajes y rutas
     async function cargarDatos() {
-      // Carga viajes
+      // Cargar archivo viajes.csv
       const responseViajes = await fetch('viajes.csv');
       const dataViajes = await responseViajes.text();
       const filasViajes = dataViajes.trim().split('\n').slice(1);
-      datosOriginales = filasViajes.map(fila => fila.split('\t'));
+      datosOriginales = filasViajes.map(fila => {
+        const cols = fila.split(',');
+        return cols.slice(0,6); // Solo las 6 columnas relevantes
+      });
 
-      // Carga rutas
+      // Cargar archivo asignados.txt (lista simple de patentes asignadas)
+      const responseAsignados = await fetch('asignados.txt');
+      const dataAsignados = await responseAsignados.text();
+      asignados = dataAsignados.trim().split('\n');
+
+      // Cargar archivo rutas.csv
       const responseRutas = await fetch('rutas.csv');
       const dataRutas = await responseRutas.text();
       const filasRutas = dataRutas.trim().split('\n').slice(1);
       rutas = filasRutas.map(fila => {
-        const cols = fila.split('\t');
+        const cols = fila.split(',');
         return {
           transporte: cols[0],
           hora_carga: cols[1],
@@ -223,11 +198,12 @@
       });
 
       crearBotonesFiltro();
-      mostrarFilas(datosOriginales);
+      mostrarFilas(datosOriginales.filter(cols => asignados.includes(cols[0]))); // Mostrar asignados por defecto
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 600000); // Recarga cada 10 minutos
+    setInterval(cargarDatos, 120000); // Recarga cada 10 min
+
   </script>
 </body>
 </html>
