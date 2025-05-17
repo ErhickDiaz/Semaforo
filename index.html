@@ -25,22 +25,33 @@
       border-bottom: 1px solid #444;
     }
 
-     th:nth-child(6),
+    th:nth-child(6),
     td:nth-child(6) {
+      text-align: right;
+      font-family: monospace;
+      color: #aaa;
+    }
+
+    th:nth-child(5),
+    td:nth-child(5) {
       text-align: center;
     }
+
     .verde { color: #00ff00; }
     .amarillo { color: #ffff00; }
     .rojo { color: #ff4c4c; }
+
     #reloj {
       font-size: 2rem;
       position: absolute;
       top: 20px;
       right: 40px;
     }
+
     #filtros {
       margin-bottom: 20px;
     }
+
     .boton-filtro {
       background-color: #333;
       border: 1px solid #555;
@@ -49,10 +60,20 @@
       margin: 5px;
       cursor: pointer;
       font-size: 1rem;
+      border-radius: 4px;
+      user-select: none;
+      transition: background-color 0.3s;
     }
     .boton-filtro:hover {
       background-color: #555;
     }
+    .boton-filtro.activo {
+      background-color: #FFD700;
+      color: #111;
+      font-weight: bold;
+      border-color: #ffd700;
+    }
+
     .fecha-actualizacion {
       text-align: right;
       font-family: monospace;
@@ -80,6 +101,10 @@
   </table>
 
   <script>
+    let datosOriginales = [];
+    let rutas = [];
+    let asignados = new Set();
+
     function actualizarReloj() {
       const ahora = new Date();
       const hora = ahora.getHours().toString().padStart(2, '0');
@@ -102,15 +127,13 @@
       return "blanco";
     }
 
-    let datosOriginales = [];
-    let rutas = [];
-
     function calcularEstadoSemaforo(ruta) {
       const ahora = new Date();
-      const horaCarga = new Date(ruta.hora_carga);
-      const horaLlegada = new Date(ruta.hora_llegada);
+      const horaCarga = ruta && ruta.hora_carga ? new Date(ruta.hora_carga) : null;
+      const horaLlegada = ruta && ruta.hora_llegada ? new Date(ruta.hora_llegada) : null;
       const margen = 30 * 60 * 1000; // 30 minutos en ms
 
+      if (!horaCarga || !horaLlegada) return "sin datos";
       if (ahora < horaCarga) return "sin iniciar";
       if (ahora >= horaCarga && ahora <= horaLlegada) return "verde";
       if (ahora > horaLlegada && ahora <= new Date(horaLlegada.getTime() + margen)) return "amarillo";
@@ -128,7 +151,7 @@
         const tr = `
           <tr>
             <td>${patente}</td>
-            <td>${cols[1]} → ${ruta ? ruta.destino : '-'}</td>
+            <td>${cols[1]} → ${ruta ? ruta.destino_geocerca : '-'}</td>
             <td>${ruta ? ruta.hora_carga : '-'}</td>
             <td>${ruta ? ruta.hora_llegada : '-'}</td>
             <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
@@ -138,43 +161,44 @@
       });
     }
 
-    function crearBotonesFiltro(rutasUnicas) {
+    function crearBotonesFiltro() {
       const contenedor = document.getElementById('filtros');
       contenedor.innerHTML = '';
+
+      const botonAsignados = document.createElement('button');
+      botonAsignados.textContent = 'Mostrar Asignados';
+      botonAsignados.className = 'boton-filtro activo';
+      botonAsignados.onclick = () => {
+        mostrarFilas(datosOriginales.filter(cols => asignados.has(cols[0])));
+        botonAsignados.classList.add('activo');
+        botonTodos.classList.remove('activo');
+      };
+      contenedor.appendChild(botonAsignados);
 
       const botonTodos = document.createElement('button');
       botonTodos.textContent = 'Mostrar Todos';
       botonTodos.className = 'boton-filtro';
-      botonTodos.onclick = () => mostrarFilas(datosOriginales);
-      contenedor.appendChild(botonTodos);
-
-      const botonAsignados = document.createElement('button');
-      botonAsignados.textContent = 'Mostrar Asignados';
-      botonAsignados.className = 'boton-filtro';
-      botonAsignados.onclick = () => {
-        const filtrado = datosOriginales.filter(cols => cols[0] && rutas.some(r => r.patente === cols[0]));
-        mostrarFilas(filtrado);
+      botonTodos.onclick = () => {
+        mostrarFilas(datosOriginales);
+        botonTodos.classList.add('activo');
+        botonAsignados.classList.remove('activo');
       };
-      contenedor.appendChild(botonAsignados);
-
-      rutasUnicas.forEach(ruta => {
-        const boton = document.createElement('button');
-        boton.textContent = ruta;
-        boton.className = 'boton-filtro';
-        boton.onclick = () => {
-          const filtrado = datosOriginales.filter(cols => cols[1] === ruta);
-          mostrarFilas(filtrado);
-        };
-        contenedor.appendChild(boton);
-      });
+      contenedor.appendChild(botonTodos);
     }
 
     async function cargarDatos() {
+      // Cargar asignados
+      const responseAsignados = await fetch('asignado.csv');
+      const dataAsignados = await responseAsignados.text();
+      asignados = new Set(dataAsignados.trim().split('\n').slice(1)); // Omitir header
+
+      // Cargar viajes
       const responseViajes = await fetch('viajes.csv');
       const dataViajes = await responseViajes.text();
       const filasViajes = dataViajes.trim().split('\n').slice(1);
       datosOriginales = filasViajes.map(fila => fila.split(','));
 
+      // Cargar rutas
       const responseRutas = await fetch('ruta.csv');
       const dataRutas = await responseRutas.text();
       const filasRutas = dataRutas.trim().split('\n').slice(1);
@@ -183,19 +207,18 @@
         return {
           patente: cols[0],
           hora_carga: cols[1],
-          origen: cols[2],
+          origen_geocerca: cols[2],
           hora_llegada: cols[3],
-          destino: cols[4]
+          destino_geocerca: cols[4]
         };
       });
 
-      const rutasUnicas = [...new Set(datosOriginales.map(cols => cols[1]))];
-      crearBotonesFiltro(rutasUnicas);
-      mostrarFilas(datosOriginales);
+      crearBotonesFiltro();
+      mostrarFilas(datosOriginales.filter(cols => asignados.has(cols[0]))); // Mostrar asignados por defecto
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 600000); // cada 10 minutos
+    setInterval(cargarDatos, 600000); // refrescar cada 10 min
   </script>
 </body>
 </html>
