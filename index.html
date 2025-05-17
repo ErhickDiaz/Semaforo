@@ -61,16 +61,14 @@
 </head>
 <body>
   <div id="reloj"></div>
-
   <div id="filtros"></div>
-
   <table id="panel">
     <thead>
       <tr>
         <th>Patente</th>
         <th>Ruta</th>
-        <th>Hora Carga</th>
-        <th>Hora Llegada</th>
+        <th>Hora Salida</th>
+        <th>ETA</th>
         <th>Semáforo</th>
         <th>Última Actualización</th>
       </tr>
@@ -88,122 +86,93 @@
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
 
-    let datosOriginales = [];
-    let rutas = [];
-    let asignados = [];
-
+    // Función para dar color al semáforo basado en texto
     function obtenerColor(estado) {
       estado = estado.toLowerCase();
       if (estado.includes("fuera de zona")) return "rojo";
-      if (estado.includes("taller") || estado.includes("en tránsito")) return "amarillo";
+      if (estado.includes("en tránsito") || estado === "sin iniciar") return "amarillo";
       if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
-      if (estado === "sin iniciar") return "amarillo";
       if (estado === "sin datos") return "rojo";
       return "blanco";
     }
 
+    let datosViajes = [];
+    let asignados = [];
+
+    // Mostrar filas en tabla
     function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
       datos.forEach(cols => {
+        const patente = cols[0];
+        const ruta = cols[1] || '-';
+        const horaSalida = cols[2] || '-';
+        const eta = cols[3] || '-';
+        const semaforo = cols[4] || 'sin datos';
+        const ultimaAct = cols[5] || '-';
+
         const tr = `
           <tr>
-            <td>${cols[0]}</td>
-            <td>${cols[1]}</td>
-            <td>${cols[2] || '-'}</td>
-            <td>${cols[3] || '-'}</td>
-            <td class="${obtenerColor(cols[4] || 'sin datos')}">${cols[4] || 'Sin datos'}</td>
-            <td class="fecha-actualizacion">${cols[5] || '-'}</td>
+            <td>${patente}</td>
+            <td>${ruta}</td>
+            <td>${horaSalida}</td>
+            <td>${eta}</td>
+            <td class="${obtenerColor(semaforo)}">${semaforo}</td>
+            <td class="fecha-actualizacion">${ultimaAct}</td>
           </tr>`;
         tbody.innerHTML += tr;
       });
     }
 
+    // Crear botones filtro para Asignados y Todos
     function crearBotonesFiltro() {
       const contenedor = document.getElementById('filtros');
       contenedor.innerHTML = '';
 
-      // Mostrar Todos
-      const botonTodos = document.createElement('button');
-      botonTodos.textContent = 'Mostrar Todos';
-      botonTodos.className = 'boton-filtro';
-      botonTodos.onclick = () => mostrarFilas(datosOriginales);
-      contenedor.appendChild(botonTodos);
-
-      // Mostrar Asignados
       const botonAsignados = document.createElement('button');
       botonAsignados.textContent = 'Mostrar Asignados';
       botonAsignados.className = 'boton-filtro';
       botonAsignados.onclick = () => {
-        const filtrado = datosOriginales.filter(cols => asignados.includes(cols[0]));
+        const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
         mostrarFilas(filtrado);
       };
       contenedor.appendChild(botonAsignados);
 
-      // Despacho
-      const botonDespacho = document.createElement('button');
-      botonDespacho.textContent = 'Despacho';
-      botonDespacho.className = 'boton-filtro';
-      botonDespacho.onclick = () => {
-        const filtrado = datosOriginales.filter(cols => {
-          // Busca patente en rutas con origen que no sea vacío (o que indique despacho)
-          return rutas.some(r => r.transporte === cols[0] && r.origen_geocerca && r.origen_geocerca.trim() !== '');
-        });
-        mostrarFilas(filtrado);
-      };
-      contenedor.appendChild(botonDespacho);
-
-      // Retorno
-      const botonRetorno = document.createElement('button');
-      botonRetorno.textContent = 'Retorno';
-      botonRetorno.className = 'boton-filtro';
-      botonRetorno.onclick = () => {
-        const filtrado = datosOriginales.filter(cols => {
-          // Busca patente en rutas con destino que no sea vacío (o que indique retorno)
-          return rutas.some(r => r.transporte === cols[0] && r.destino_geocerca && r.destino_geocerca.trim() !== '');
-        });
-        mostrarFilas(filtrado);
-      };
-      contenedor.appendChild(botonRetorno);
+      const botonTodos = document.createElement('button');
+      botonTodos.textContent = 'Mostrar Todos';
+      botonTodos.className = 'boton-filtro';
+      botonTodos.onclick = () => mostrarFilas(datosViajes);
+      contenedor.appendChild(botonTodos);
     }
 
     async function cargarDatos() {
-      // Cargar archivo viajes.csv
+      // Cargar asignados
+      const responseAsignados = await fetch('asignado.csv');
+      const dataAsignados = await responseAsignados.text();
+      asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
+
+      // Cargar viajes
       const responseViajes = await fetch('viajes.csv');
       const dataViajes = await responseViajes.text();
-      const filasViajes = dataViajes.trim().split('\n').slice(1);
-      datosOriginales = filasViajes.map(fila => {
-        const cols = fila.split(',');
-        return cols.slice(0,6); // Solo las 6 columnas relevantes
-      });
+      const filas = dataViajes.trim().split('\n');
+      const encabezado = filas.shift().split(/[,\t]/); // soporta coma o tab
 
-      // Cargar archivo asignados.txt (lista simple de patentes asignadas)
-      const responseAsignados = await fetch('asignados.txt');
-      const dataAsignados = await responseAsignados.text();
-      asignados = dataAsignados.trim().split('\n');
-
-      // Cargar archivo rutas.csv
-      const responseRutas = await fetch('rutas.csv');
-      const dataRutas = await responseRutas.text();
-      const filasRutas = dataRutas.trim().split('\n').slice(1);
-      rutas = filasRutas.map(fila => {
-        const cols = fila.split(',');
-        return {
-          transporte: cols[0],
-          hora_carga: cols[1],
-          origen_geocerca: cols[2],
-          hora_llegada: cols[3],
-          destino_geocerca: cols[4]
-        };
+      datosViajes = filas.map(fila => {
+        // Soporta CSV con coma o tab
+        let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
+        // Normalizar campos, evitar espacios extras
+        return cols.map(c => c.trim());
       });
 
       crearBotonesFiltro();
-      mostrarFilas(datosOriginales.filter(cols => asignados.includes(cols[0]))); // Mostrar asignados por defecto
+
+      // Mostrar asignados por defecto
+      const asignadosFiltrados = datosViajes.filter(cols => asignados.includes(cols[0].toUpperCase()));
+      mostrarFilas(asignadosFiltrados);
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 120000); // Recarga cada 10 min
-
+    setInterval(cargarDatos, 600000); // actualizar cada 10 minutos
   </script>
 </body>
 </html>
