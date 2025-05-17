@@ -61,14 +61,16 @@
 </head>
 <body>
   <div id="reloj"></div>
+
   <div id="filtros"></div>
+
   <table id="panel">
     <thead>
       <tr>
         <th>Patente</th>
         <th>Ruta</th>
-        <th>Hora Salida</th>
-        <th>ETA</th>
+        <th>Hora Carga</th>
+        <th>Hora Llegada</th>
         <th>Semáforo</th>
         <th>Última Actualización</th>
       </tr>
@@ -77,6 +79,7 @@
   </table>
 
   <script>
+    // Actualiza el reloj en pantalla
     function actualizarReloj() {
       const ahora = new Date();
       const hora = ahora.getHours().toString().padStart(2, '0');
@@ -86,93 +89,145 @@
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
 
-    // Función para dar color al semáforo basado en texto
+    // Función para asignar color según estado
     function obtenerColor(estado) {
       estado = estado.toLowerCase();
       if (estado.includes("fuera de zona")) return "rojo";
-      if (estado.includes("en tránsito") || estado === "sin iniciar") return "amarillo";
+      if (estado.includes("taller") || estado.includes("en tránsito") || estado === "despacho" || estado === "retorno") return "amarillo";
       if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
+      if (estado === "sin iniciar") return "amarillo";
       if (estado === "sin datos") return "rojo";
       return "blanco";
     }
 
-    let datosViajes = [];
-    let asignados = [];
+    // Variables globales para datos
+    let datosOriginales = [];
+    let rutas = [];
 
-    // Mostrar filas en tabla
+    // Calcular estado semáforo en base a horarios
+    function calcularEstadoSemaforo(ruta) {
+      const ahora = new Date();
+      const horaCarga = new Date(ruta.hora_carga);
+      const horaLlegada = new Date(ruta.hora_llegada);
+      const margen = 30 * 60 * 1000; // 30 minutos en ms
+
+      if (ahora < horaCarga) return "Sin iniciar";
+      if (ahora >= horaCarga && ahora <= horaLlegada) return "En tránsito";
+      if (ahora > horaLlegada && ahora <= new Date(horaLlegada.getTime() + margen)) return "Despacho";
+      return "Retorno";
+    }
+
+    // Mostrar filas en la tabla
     function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
       datos.forEach(cols => {
         const patente = cols[0];
-        const ruta = cols[1] || '-';
-        const horaSalida = cols[2] || '-';
-        const eta = cols[3] || '-';
-        const semaforo = cols[4] || 'sin datos';
-        const ultimaAct = cols[5] || '-';
+        const ruta = rutas.find(r => r.transporte === patente);
+        const estadoSemaforo = ruta ? calcularEstadoSemaforo(ruta) : (cols[4] || "Sin datos");
+
+        const origen = ruta ? ruta.origen_geocerca : '-';
+        const destino = ruta ? ruta.destino_geocerca : '-';
+        const horaCarga = ruta ? ruta.hora_carga : '-';
+        const horaLlegada = ruta ? ruta.hora_llegada : '-';
 
         const tr = `
           <tr>
             <td>${patente}</td>
-            <td>${ruta}</td>
-            <td>${horaSalida}</td>
-            <td>${eta}</td>
-            <td class="${obtenerColor(semaforo)}">${semaforo}</td>
-            <td class="fecha-actualizacion">${ultimaAct}</td>
+            <td>${origen} → ${destino}</td>
+            <td>${horaCarga}</td>
+            <td>${horaLlegada}</td>
+            <td class="${obtenerColor(estadoSemaforo)}">${estadoSemaforo}</td>
+            <td class="fecha-actualizacion">${cols[5] || '-'}</td>
           </tr>`;
         tbody.innerHTML += tr;
       });
     }
 
-    // Crear botones filtro para Asignados y Todos
+    // Crear botones filtro incluyendo los nuevos filtros
     function crearBotonesFiltro() {
       const contenedor = document.getElementById('filtros');
       contenedor.innerHTML = '';
 
+      // Mostrar Todos
+      const botonTodos = document.createElement('button');
+      botonTodos.textContent = 'Mostrar Todos';
+      botonTodos.className = 'boton-filtro';
+      botonTodos.onclick = () => mostrarFilas(datosOriginales);
+      contenedor.appendChild(botonTodos);
+
+      // Mostrar Asignados
       const botonAsignados = document.createElement('button');
       botonAsignados.textContent = 'Mostrar Asignados';
       botonAsignados.className = 'boton-filtro';
       botonAsignados.onclick = () => {
-        const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
+        const filtrado = datosOriginales.filter(cols => cols[0] && rutas.some(r => r.transporte === cols[0]));
         mostrarFilas(filtrado);
       };
       contenedor.appendChild(botonAsignados);
 
-      const botonTodos = document.createElement('button');
-      botonTodos.textContent = 'Mostrar Todos';
-      botonTodos.className = 'boton-filtro';
-      botonTodos.onclick = () => mostrarFilas(datosViajes);
-      contenedor.appendChild(botonTodos);
+      // Filtro Despacho (estado = "Despacho")
+      const botonDespacho = document.createElement('button');
+      botonDespacho.textContent = 'Despacho';
+      botonDespacho.className = 'boton-filtro';
+      botonDespacho.onclick = () => {
+        const filtrado = datosOriginales.filter(cols => {
+          const patente = cols[0];
+          const ruta = rutas.find(r => r.transporte === patente);
+          if (!ruta) return false;
+          const estado = calcularEstadoSemaforo(ruta);
+          return estado === "Despacho";
+        });
+        mostrarFilas(filtrado);
+      };
+      contenedor.appendChild(botonDespacho);
+
+      // Filtro Retorno (estado = "Retorno")
+      const botonRetorno = document.createElement('button');
+      botonRetorno.textContent = 'Retorno';
+      botonRetorno.className = 'boton-filtro';
+      botonRetorno.onclick = () => {
+        const filtrado = datosOriginales.filter(cols => {
+          const patente = cols[0];
+          const ruta = rutas.find(r => r.transporte === patente);
+          if (!ruta) return false;
+          const estado = calcularEstadoSemaforo(ruta);
+          return estado === "Retorno";
+        });
+        mostrarFilas(filtrado);
+      };
+      contenedor.appendChild(botonRetorno);
     }
 
+    // Cargar datos viajes y rutas
     async function cargarDatos() {
-      // Cargar asignados
-      const responseAsignados = await fetch('asignado.csv');
-      const dataAsignados = await responseAsignados.text();
-      asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
-
-      // Cargar viajes
+      // Carga viajes
       const responseViajes = await fetch('viajes.csv');
       const dataViajes = await responseViajes.text();
-      const filas = dataViajes.trim().split('\n');
-      const encabezado = filas.shift().split(/[,\t]/); // soporta coma o tab
+      const filasViajes = dataViajes.trim().split('\n').slice(1);
+      datosOriginales = filasViajes.map(fila => fila.split('\t'));
 
-      datosViajes = filas.map(fila => {
-        // Soporta CSV con coma o tab
-        let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-        // Normalizar campos, evitar espacios extras
-        return cols.map(c => c.trim());
+      // Carga rutas
+      const responseRutas = await fetch('rutas.csv');
+      const dataRutas = await responseRutas.text();
+      const filasRutas = dataRutas.trim().split('\n').slice(1);
+      rutas = filasRutas.map(fila => {
+        const cols = fila.split('\t');
+        return {
+          transporte: cols[0],
+          hora_carga: cols[1],
+          origen_geocerca: cols[2],
+          hora_llegada: cols[3],
+          destino_geocerca: cols[4]
+        };
       });
 
       crearBotonesFiltro();
-
-      // Mostrar asignados por defecto
-      const asignadosFiltrados = datosViajes.filter(cols => asignados.includes(cols[0].toUpperCase()));
-      mostrarFilas(asignadosFiltrados);
+      mostrarFilas(datosOriginales);
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 600000); // actualizar cada 10 minutos
+    setInterval(cargarDatos, 600000); // Recarga cada 10 minutos
   </script>
 </body>
 </html>
