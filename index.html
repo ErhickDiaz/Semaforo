@@ -31,6 +31,7 @@
     .verde { color: #00ff00; }
     .amarillo { color: #ffff00; }
     .rojo { color: #ff4c4c; }
+    .gray { color: #ccc; }
     #reloj {
       font-size: 2rem;
       position: absolute;
@@ -48,9 +49,18 @@
       margin: 5px;
       cursor: pointer;
       font-size: 1rem;
+      border-radius: 4px;
+      transition: background-color 0.3s, box-shadow 0.3s;
     }
     .boton-filtro:hover {
       background-color: #555;
+    }
+    .boton-filtro.activo {
+      background-color: #FFD700;
+      color: #111;
+      box-shadow: 0 0 10px #FFD700;
+      border-color: #FFD700;
+      font-weight: bold;
     }
     .fecha-actualizacion {
       text-align: right;
@@ -86,20 +96,21 @@
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
 
-    // Función para dar color al semáforo basado en texto
     function obtenerColor(estado) {
       estado = estado.toLowerCase();
       if (estado.includes("fuera de zona")) return "rojo";
       if (estado.includes("en tránsito") || estado === "sin iniciar") return "amarillo";
       if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
       if (estado === "sin datos") return "rojo";
-      return "blanco";
+      return "gray";
     }
 
     let datosViajes = [];
     let asignados = [];
+    let datosRutas = [];
 
-    // Mostrar filas en tabla
+    let filtroActivo = 'Asignados';
+
     function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
@@ -124,25 +135,58 @@
       });
     }
 
-    // Crear botones filtro para Asignados y Todos
     function crearBotonesFiltro() {
       const contenedor = document.getElementById('filtros');
       contenedor.innerHTML = '';
 
-      const botonAsignados = document.createElement('button');
-      botonAsignados.textContent = 'Mostrar Asignados';
-      botonAsignados.className = 'boton-filtro';
-      botonAsignados.onclick = () => {
-        const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
-        mostrarFilas(filtrado);
-      };
-      contenedor.appendChild(botonAsignados);
+      const filtros = [
+        { nombre: 'Asignados', func: filtrarAsignados },
+        { nombre: 'Todos', func: () => mostrarFilas(datosViajes) },
+        { nombre: 'Despacho', func: filtrarDespacho },
+        { nombre: 'Retorno', func: filtrarRetorno }
+      ];
 
-      const botonTodos = document.createElement('button');
-      botonTodos.textContent = 'Mostrar Todos';
-      botonTodos.className = 'boton-filtro';
-      botonTodos.onclick = () => mostrarFilas(datosViajes);
-      contenedor.appendChild(botonTodos);
+      filtros.forEach(filtro => {
+        const btn = document.createElement('button');
+        btn.textContent = filtro.nombre;
+        btn.className = 'boton-filtro';
+        if (filtro.nombre === filtroActivo) btn.classList.add('activo');
+        btn.onclick = () => {
+          filtroActivo = filtro.nombre;
+          marcarBotonActivo();
+          filtro.func();
+        };
+        contenedor.appendChild(btn);
+      });
+    }
+
+    function marcarBotonActivo() {
+      const botones = document.querySelectorAll('.boton-filtro');
+      botones.forEach(boton => {
+        if (boton.textContent === filtroActivo) {
+          boton.classList.add('activo');
+        } else {
+          boton.classList.remove('activo');
+        }
+      });
+    }
+
+    function filtrarAsignados() {
+      const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
+      mostrarFilas(filtrado);
+    }
+
+    function filtrarDespacho() {
+      // Listado de patentes que están en rutas.csv
+      const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
+      // Filtramos datosViajes mostrando solo los que están en patentesRutas
+      const filtrado = datosViajes.filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
+      mostrarFilas(filtrado);
+    }
+
+    function filtrarRetorno() {
+      // Por ahora vacío
+      mostrarFilas([]);
     }
 
     async function cargarDatos() {
@@ -154,21 +198,25 @@
       // Cargar viajes
       const responseViajes = await fetch('viajes.csv');
       const dataViajes = await responseViajes.text();
-      const filas = dataViajes.trim().split('\n');
-      const encabezado = filas.shift().split(/[,\t]/); // soporta coma o tab
-
-      datosViajes = filas.map(fila => {
-        // Soporta CSV con coma o tab
+      const filasViajes = dataViajes.trim().split('\n');
+      filasViajes.shift(); // quitar encabezado
+      datosViajes = filasViajes.map(fila => {
         let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-        // Normalizar campos, evitar espacios extras
+        return cols.map(c => c.trim());
+      });
+
+      // Cargar rutas (para filtro despacho)
+      const responseRutas = await fetch('rutas.csv');
+      const dataRutas = await responseRutas.text();
+      const filasRutas = dataRutas.trim().split('\n');
+      filasRutas.shift(); // quitar encabezado
+      datosRutas = filasRutas.map(fila => {
+        let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
         return cols.map(c => c.trim());
       });
 
       crearBotonesFiltro();
-
-      // Mostrar asignados por defecto
-      const asignadosFiltrados = datosViajes.filter(cols => asignados.includes(cols[0].toUpperCase()));
-      mostrarFilas(asignadosFiltrados);
+      filtrarAsignados(); // Mostrar asignados por defecto
     }
 
     cargarDatos();
