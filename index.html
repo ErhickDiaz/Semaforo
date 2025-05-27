@@ -74,14 +74,13 @@
   <div id="filtros"></div>
   <table id="panel">
     <thead>
-      <tr>
+      <tr id="header-row">
         <th>Patente</th>
         <th>Ruta</th>
         <th>Hora Salida</th>
         <th>ETA</th>
         <th>Semáforo</th>
         <th>Última Actualización</th>
-        <th>Destino Retorno</th> <!-- Columna extra para retorno -->
       </tr>
     </thead>
     <tbody></tbody>
@@ -113,34 +112,62 @@
 
     let filtroActivo = 'Asignados';
 
-    function mostrarFilas(datos, mostrarDestino = false) {
+    function mostrarFilas(datos, filtro) {
       const tbody = document.querySelector('#panel tbody');
+      const headerRow = document.getElementById('header-row');
       tbody.innerHTML = '';
+
+      // Ajustar encabezados según filtro
+      if (filtro === 'Retorno') {
+        headerRow.innerHTML = `
+          <th>Patente</th>
+          <th>ETA</th>
+          <th>Última Actualización</th>
+        `;
+      } else {
+        headerRow.innerHTML = `
+          <th>Patente</th>
+          <th>Ruta</th>
+          <th>Hora Salida</th>
+          <th>ETA</th>
+          <th>Semáforo</th>
+          <th>Última Actualización</th>
+        `;
+      }
+
       datos.forEach(cols => {
         const patente = cols[0];
-        const ruta = cols[1] || '-';
-        const horaSalida = cols[2] || '-';
-        const eta = cols[3] || '-';
-        const semaforo = cols[4] || 'sin datos';
-        const ultimaAct = cols[5] || '-';
-        
-        let destinoRetorno = '-';
-        if (mostrarDestino) {
-          const ret = datosRetorno.find(r => r[0].toUpperCase() === patente.toUpperCase());
-          if (ret) destinoRetorno = ret[1];
-        }
+        if (filtro === 'Retorno') {
+          // Solo mostrar Patente, ETA y Última Actualización
+          const eta = cols[3] || '-';
+          const ultimaAct = cols[5] || '-';
 
-        const tr = `
-          <tr>
-            <td>${patente}</td>
-            <td>${ruta}</td>
-            <td>${horaSalida}</td>
-            <td>${eta}</td>
-            <td class="${obtenerColor(semaforo)}">${semaforo}</td>
-            <td class="fecha-actualizacion">${ultimaAct}</td>
-            ${mostrarDestino ? `<td>${destinoRetorno}</td>` : `<td>-</td>`}
-          </tr>`;
-        tbody.innerHTML += tr;
+          const tr = `
+            <tr>
+              <td>${patente}</td>
+              <td>${eta}</td>
+              <td class="fecha-actualizacion">${ultimaAct}</td>
+            </tr>`;
+          tbody.innerHTML += tr;
+        } else {
+          // Mostrar todas las columnas
+          const ruta = cols[1] || '-';
+          const horaSalida = cols[2] || '-';
+          const eta = cols[3] || '-';
+          const semaforo = cols[4] || 'sin datos';
+          const ultimaAct = cols[5] || '-';
+
+          const tr = `
+            <tr>
+              <td>${patente}</td>
+              <td>${ruta}</td>
+              <td>${horaSalida}</td>
+              <td>${eta}</td>
+              <td class="${obtenerColor(semaforo)}">${semaforo}</td>
+              <td class="fecha-actualizacion">${ultimaAct}</td>
+            </tr>`;
+          tbody.innerHTML += tr;
+        }
       });
     }
 
@@ -150,7 +177,7 @@
 
       const filtros = [
         { nombre: 'Asignados', func: filtrarAsignados },
-        { nombre: 'Todos', func: () => mostrarFilas(datosViajes) },
+        { nombre: 'Todos', func: () => mostrarFilas(datosViajes, 'Todos') },
         { nombre: 'Despacho', func: filtrarDespacho },
         { nombre: 'Retorno', func: filtrarRetorno }
       ];
@@ -182,19 +209,19 @@
 
     function filtrarAsignados() {
       const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
-      mostrarFilas(filtrado);
+      mostrarFilas(filtrado, 'Asignados');
     }
 
     function filtrarDespacho() {
       const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
       const filtrado = datosViajes.filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
-      mostrarFilas(filtrado);
+      mostrarFilas(filtrado, 'Despacho');
     }
 
     function filtrarRetorno() {
       const patentesRetorno = datosRetorno.map(r => r[0].toUpperCase());
       const filtrado = datosViajes.filter(d => patentesRetorno.includes(d[0].toUpperCase()));
-      mostrarFilas(filtrado, true);
+      mostrarFilas(filtrado, 'Retorno');
     }
 
     async function cargarDatos() {
@@ -234,7 +261,7 @@
       });
 
       crearBotonesFiltro();
-      filtrarAsignados(); // Mostrar asignados por defecto
+      filtrarAsignados(); // mostrar asignados por defecto
     }
 
     cargarDatos();
