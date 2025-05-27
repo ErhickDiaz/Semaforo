@@ -74,7 +74,7 @@
   <div id="filtros"></div>
   <table id="panel">
     <thead>
-      <tr id="header-row">
+      <tr>
         <th>Patente</th>
         <th>Ruta</th>
         <th>Hora Salida</th>
@@ -108,66 +108,51 @@
     let datosViajes = [];
     let asignados = [];
     let datosRutas = [];
-    let datosRetorno = [];
 
     let filtroActivo = 'Asignados';
 
-    function mostrarFilas(datos, filtro) {
+    function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
-      const headerRow = document.getElementById('header-row');
       tbody.innerHTML = '';
-
-      // Ajustar encabezados según filtro
-      if (filtro === 'Retorno') {
-        headerRow.innerHTML = `
-          <th>Patente</th>
-          <th>ETA</th>
-          <th>Última Actualización</th>
-        `;
-      } else {
-        headerRow.innerHTML = `
-          <th>Patente</th>
-          <th>Ruta</th>
-          <th>Hora Salida</th>
-          <th>ETA</th>
-          <th>Semáforo</th>
-          <th>Última Actualización</th>
-        `;
-      }
-
       datos.forEach(cols => {
         const patente = cols[0];
-        if (filtro === 'Retorno') {
-          // Solo mostrar Patente, ETA y Última Actualización
-          const eta = cols[3] || '-';
-          const ultimaAct = cols[5] || '-';
+        const ruta = cols[1] || '-';
+        const horaSalida = cols[2] || '-';
+        const eta = cols[3] || '-';
+        const semaforo = cols[4] || 'sin datos';
+        const ultimaAct = cols[5] || '-';
 
-          const tr = `
-            <tr>
-              <td>${patente}</td>
-              <td>${eta}</td>
-              <td class="fecha-actualizacion">${ultimaAct}</td>
-            </tr>`;
-          tbody.innerHTML += tr;
-        } else {
-          // Mostrar todas las columnas
-          const ruta = cols[1] || '-';
-          const horaSalida = cols[2] || '-';
-          const eta = cols[3] || '-';
-          const semaforo = cols[4] || 'sin datos';
-          const ultimaAct = cols[5] || '-';
+        const tr = `
+          <tr>
+            <td>${patente}</td>
+            <td>${ruta}</td>
+            <td>${horaSalida}</td>
+            <td>${eta}</td>
+            <td class="${obtenerColor(semaforo)}">${semaforo}</td>
+            <td class="fecha-actualizacion">${ultimaAct}</td>
+          </tr>`;
+        tbody.innerHTML += tr;
+      });
+    }
 
-          const tr = `
-            <tr>
-              <td>${patente}</td>
-              <td>${ruta}</td>
-              <td>${horaSalida}</td>
-              <td>${eta}</td>
-              <td class="${obtenerColor(semaforo)}">${semaforo}</td>
-              <td class="fecha-actualizacion">${ultimaAct}</td>
-            </tr>`;
-          tbody.innerHTML += tr;
-        }
+    function mostrarFilasRetorno(datos) {
+      const tbody = document.querySelector('#panel tbody');
+      tbody.innerHTML = '';
+      datos.forEach(cols => {
+        const patente = cols[0];
+        const eta = cols[1] || '-';
+        const ultimaAct = cols[2] || '-';
+
+        const tr = `
+          <tr>
+            <td>${patente}</td>
+            <td>-</td>  <!-- ocultamos Ruta -->
+            <td>-</td>  <!-- ocultamos Hora Salida -->
+            <td>${eta}</td>
+            <td>-</td>  <!-- ocultamos Semáforo -->
+            <td class="fecha-actualizacion">${ultimaAct}</td>
+          </tr>`;
+        tbody.innerHTML += tr;
       });
     }
 
@@ -177,7 +162,7 @@
 
       const filtros = [
         { nombre: 'Asignados', func: filtrarAsignados },
-        { nombre: 'Todos', func: () => mostrarFilas(datosViajes, 'Todos') },
+        { nombre: 'Todos', func: () => mostrarFilas(datosViajes) },
         { nombre: 'Despacho', func: filtrarDespacho },
         { nombre: 'Retorno', func: filtrarRetorno }
       ];
@@ -209,59 +194,53 @@
 
     function filtrarAsignados() {
       const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
-      mostrarFilas(filtrado, 'Asignados');
+      mostrarFilas(filtrado);
     }
 
     function filtrarDespacho() {
       const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
       const filtrado = datosViajes.filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
-      mostrarFilas(filtrado, 'Despacho');
+      mostrarFilas(filtrado);
     }
 
     function filtrarRetorno() {
-      const patentesRetorno = datosRetorno.map(r => r[0].toUpperCase());
-      const filtrado = datosViajes.filter(d => patentesRetorno.includes(d[0].toUpperCase()));
-      mostrarFilas(filtrado, 'Retorno');
+      // Mostrar solo Transporte, ETA y Última Actualización
+      const filtrado = datosViajes.map(cols => [cols[0], cols[3], cols[5]]);
+      mostrarFilasRetorno(filtrado);
     }
 
     async function cargarDatos() {
-      // Cargar asignados
-      const responseAsignados = await fetch('asignado.csv');
-      const dataAsignados = await responseAsignados.text();
-      asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
+      try {
+        // Cargar asignados
+        const responseAsignados = await fetch('asignado.csv');
+        const dataAsignados = await responseAsignados.text();
+        asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
 
-      // Cargar viajes
-      const responseViajes = await fetch('viajes.csv');
-      const dataViajes = await responseViajes.text();
-      const filasViajes = dataViajes.trim().split('\n');
-      filasViajes.shift(); // quitar encabezado
-      datosViajes = filasViajes.map(fila => {
-        let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-        return cols.map(c => c.trim());
-      });
+        // Cargar viajes
+        const responseViajes = await fetch('viajes.csv');
+        const dataViajes = await responseViajes.text();
+        const filasViajes = dataViajes.trim().split('\n');
+        filasViajes.shift(); // quitar encabezado
+        datosViajes = filasViajes.map(fila => {
+          let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
+          return cols.map(c => c.trim());
+        });
 
-      // Cargar rutas
-      const responseRutas = await fetch('rutas.csv');
-      const dataRutas = await responseRutas.text();
-      const filasRutas = dataRutas.trim().split('\n');
-      filasRutas.shift(); // quitar encabezado
-      datosRutas = filasRutas.map(fila => {
-        let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-        return cols.map(c => c.trim());
-      });
+        // Cargar rutas (para filtro despacho)
+        const responseRutas = await fetch('rutas.csv');
+        const dataRutas = await responseRutas.text();
+        const filasRutas = dataRutas.trim().split('\n');
+        filasRutas.shift(); // quitar encabezado
+        datosRutas = filasRutas.map(fila => {
+          let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
+          return cols.map(c => c.trim());
+        });
 
-      // Cargar retorno
-      const responseRetorno = await fetch('retorno.csv');
-      const dataRetorno = await responseRetorno.text();
-      const filasRetorno = dataRetorno.trim().split('\n');
-      filasRetorno.shift(); // quitar encabezado
-      datosRetorno = filasRetorno.map(fila => {
-        let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-        return cols.map(c => c.trim());
-      });
-
-      crearBotonesFiltro();
-      filtrarAsignados(); // mostrar asignados por defecto
+        crearBotonesFiltro();
+        filtrarAsignados(); // Mostrar asignados por defecto
+      } catch (error) {
+        console.error('Error cargando datos:', error);
+      }
     }
 
     cargarDatos();
