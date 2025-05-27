@@ -81,6 +81,7 @@
         <th>ETA</th>
         <th>Semáforo</th>
         <th>Última Actualización</th>
+        <th>Destino Retorno</th> <!-- Columna extra para retorno -->
       </tr>
     </thead>
     <tbody></tbody>
@@ -108,10 +109,11 @@
     let datosViajes = [];
     let asignados = [];
     let datosRutas = [];
+    let datosRetorno = [];
 
     let filtroActivo = 'Asignados';
 
-    function mostrarFilas(datos) {
+    function mostrarFilas(datos, mostrarDestino = false) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
       datos.forEach(cols => {
@@ -121,6 +123,12 @@
         const eta = cols[3] || '-';
         const semaforo = cols[4] || 'sin datos';
         const ultimaAct = cols[5] || '-';
+        
+        let destinoRetorno = '-';
+        if (mostrarDestino) {
+          const ret = datosRetorno.find(r => r[0].toUpperCase() === patente.toUpperCase());
+          if (ret) destinoRetorno = ret[1];
+        }
 
         const tr = `
           <tr>
@@ -130,6 +138,7 @@
             <td>${eta}</td>
             <td class="${obtenerColor(semaforo)}">${semaforo}</td>
             <td class="fecha-actualizacion">${ultimaAct}</td>
+            ${mostrarDestino ? `<td>${destinoRetorno}</td>` : `<td>-</td>`}
           </tr>`;
         tbody.innerHTML += tr;
       });
@@ -177,16 +186,15 @@
     }
 
     function filtrarDespacho() {
-      // Listado de patentes que están en rutas.csv
       const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
-      // Filtramos datosViajes mostrando solo los que están en patentesRutas
       const filtrado = datosViajes.filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
       mostrarFilas(filtrado);
     }
 
     function filtrarRetorno() {
-      // Por ahora vacío
-      mostrarFilas([]);
+      const patentesRetorno = datosRetorno.map(r => r[0].toUpperCase());
+      const filtrado = datosViajes.filter(d => patentesRetorno.includes(d[0].toUpperCase()));
+      mostrarFilas(filtrado, true);
     }
 
     async function cargarDatos() {
@@ -205,12 +213,22 @@
         return cols.map(c => c.trim());
       });
 
-      // Cargar rutas (para filtro despacho)
+      // Cargar rutas
       const responseRutas = await fetch('rutas.csv');
       const dataRutas = await responseRutas.text();
       const filasRutas = dataRutas.trim().split('\n');
       filasRutas.shift(); // quitar encabezado
       datosRutas = filasRutas.map(fila => {
+        let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
+        return cols.map(c => c.trim());
+      });
+
+      // Cargar retorno
+      const responseRetorno = await fetch('retorno.csv');
+      const dataRetorno = await responseRetorno.text();
+      const filasRetorno = dataRetorno.trim().split('\n');
+      filasRetorno.shift(); // quitar encabezado
+      datosRetorno = filasRetorno.map(fila => {
         let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
         return cols.map(c => c.trim());
       });
