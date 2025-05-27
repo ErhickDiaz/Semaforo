@@ -1,11 +1,11 @@
 Transporte,Ruta,Hora Salida,ETA,Semáforo,Última Actualización,Latitud,Longitud
 PJJV29,Planta San Gabriel,,,En tránsito,05-26 06:20,-35.832194,-71.640163
 SVLV52,Fuera de zona,,,Fuera de zona,05-27 02:19,-40.172638,-72.899383
-PZDJ66,Fuera de zona,,,Fuera de zona,05-27 02:20,-40.279045,-72.96474
+PZDJ66,Fuera de zona,,,Fuera de zona,05-27 02:21,-40.262933,-72.956478
 LXHJ99,Planta San Gabriel,,,En tránsito,05-27 02:18,-35.831262,-71.640451
 LZRG89,Planta San Gabriel,,,En tránsito,05-27 02:15,-35.83176,-71.641716
-PSLY21,Fuera de zona,,,Fuera de zona,05-27 02:19,-31.980376,-71.501039
-PGBY32,Fuera de zona,,,Fuera de zona,05-27 02:19,-36.445083,-71.971826
+PSLY21,Fuera de zona,,,Fuera de zona,05-27 02:21,-31.996438,-71.510815
+PGBY32,Fuera de zona,,,Fuera de zona,05-27 02:21,-36.456125,-71.990448
 RHDX20,Planta San Gabriel,,,En tránsito,05-27 02:16,-35.832009,-71.640572
 PFBS17,Planta San Gabriel,,,En tránsito,04-28 16:33,-35.830982,-71.641089
 LXHJ98,Fuera de zona,,,Fuera de zona,05-27 02:16,-29.05877,-70.905734
@@ -15,38 +15,38 @@ LTGY83,Planta San Gabriel,,,En tránsito,05-27 02:19,-35.832,-71.640224
 KBLZ46,Fuera de zona,,,Fuera de zona,05-27 02:20,-26.342768,-70.620916
 SPVR14E,Fuera de zona,,,Sin señal,No disponible,,
 PSLY27,Fuera de zona,,,Fuera de zona,05-26 06:23,-35.84168,-71.636108
-JJWG93,Fuera de zona,,,Fuera de zona,05-27 02:20,-32.016312,-71.509453
-PFBS13,Fuera de zona,,,Fuera de zona,05-27 02:20,-32.827804,-71.130287
-RFZY94,Fuera de zona,,,Fuera de zona,05-27 02:20,-35.570639,-71.698403
+JJWG93,Fuera de zona,,,Fuera de zona,05-27 02:21,-32.035334,-71.510852
+PFBS13,Fuera de zona,,,Fuera de zona,05-27 02:21,-32.827804,-71.130287
+RFZY94,Fuera de zona,,,Fuera de zona,05-27 02:21,-35.57191,-71.690048
 PFBS11,Fuera de zona,,,Sin señal,No disponible,,
 RFZY95,ICB,,,En tránsito,05-27 02:15,-33.333188,-70.697116
 RFZY96,Planta San Gabriel,,,En tránsito,04-21 05:15,-35.831231,-71.641081
-PWZH32,Planta San Gabriel,,,En tránsito,05-27 02:20,-35.829493,-71.641469
-SSRT52,Fuera de zona,,,Fuera de zona,05-27 02:20,-33.598134,-70.715944
-JJWG66,Fuera de zona,,,Fuera de zona,05-27 02:20,-35.189944,-71.393794
-LCTB55,Fuera de zona,,,Fuera de zona,05-27 02:19,-35.034424,-71.254107
+PWZH32,Planta San Gabriel,,,En tránsito,05-27 02:21,-35.830033,-71.641597
+SSRT52,Fuera de zona,,,Fuera de zona,05-27 02:21,-33.615945,-70.715751
+JJWG66,Fuera de zona,,,Fuera de zona,05-27 02:21,-35.204138,-71.406302
+LCTB55,Fuera de zona,,,Fuera de zona,05-27 02:21,-35.048621,-71.278529
 PFBS18,Planta San Gabriel,,,En tránsito,05-26 20:18,-35.83111,-71.641403
-RFZY97,Fuera de zona,,,Fuera de zona,05-27 02:20,-29.614753,-71.278941
+RFZY97,Fuera de zona,,,Fuera de zona,05-27 02:20,-29.613098,-71.273496
 PJJV11,Fuera de zona,,,Fuera de zona,05-26 13:38,-36.651653,-72.228087
 RHDX19,Planta San Gabriel,,,En tránsito,05-25 05:42,-35.831817,-71.640292
 PJJV10,Fuera de zona,,,Fuera de zona,05-17 17:38,-35.417659,-71.63312
 PZDJ88,Fuera de zona,,,Sin señal,No disponible,,
-RFZY93,Itata 1.0 ,,,En tránsito,05-27 02:19,-36.70702,-72.714433
+RFZY93,Itata 1.0 ,,,En tránsito,05-27 02:21,-36.720297,-72.733583
 LTGY85,"ICB Temuco, IDEAL_TEMUCO",,,En tránsito,05-27 02:12,-38.686093,-72.523376
 PFBS12,Planta San Gabriel,,,En tránsito,05-25 05:49,-35.832013,-71.640425
-PSLY20,Fuera de zona,,,Fuera de zona,05-27 02:20,-33.690334,-70.725102
+PSLY20,Fuera de zona,,,Fuera de zona,05-27 02:21,-33.672293,-70.72239
 KBLZ47,Fuera de zona,,,Fuera de zona,05-26 06:21,-35.436044,-71.63752
 RHDX18,IDEAL_TALCA,,,En tránsito,05-27 02:14,-35.485143,-71.659771
 PCLZ42,Planta ABI,,,En tránsito,05-27 02:17,-33.338172,-70.717597
 PSLY22,Planta San Gabriel,,,En tránsito,05-26 06:26,-35.832135,-71.640239
-LTGY86,Fuera de zona,,,Fuera de zona,05-27 02:11,-26.3428,-70.621265
-PFBS16,Fuera de zona,,,Fuera de zona,05-27 02:20,-29.352791,-71.042433
-KZPW51,Fuera de zona,,,Fuera de zona,05-27 02:20,-37.411488,-72.344423
+LTGY86,Fuera de zona,,,Fuera de zona,05-27 02:21,-26.3428,-70.621265
+PFBS16,Fuera de zona,,,Fuera de zona,05-27 02:20,-29.344821,-71.038578
+KZPW51,Fuera de zona,,,Fuera de zona,05-27 02:21,-37.42295,-72.336966
 PFBS15,Fuera de zona,,,Fuera de zona,05-20 22:14,-36.651507,-72.22732
 PGKD18,Planta San Gabriel,,,En tránsito,05-27 02:15,-35.831953,-71.640524
-PGKD17,Fuera de zona,,,Fuera de zona,05-27 02:20,-34.556101,-70.964219
-TBGH39,Fuera de zona,,,Fuera de zona,05-27 02:19,-34.276244,-70.815015
-PCLZ41,Planta San Gabriel,,,En tránsito,05-27 02:19,-35.83074,-71.641659
+PGKD17,Fuera de zona,,,Fuera de zona,05-27 02:21,-34.543025,-70.950519
+TBGH39,Fuera de zona,,,Fuera de zona,05-27 02:21,-34.257992,-70.804582
+PCLZ41,Planta San Gabriel,,,En tránsito,05-27 02:21,-35.831771,-71.641785
 RFZY98,Fuera de zona,,,Fuera de zona,05-27 02:14,-20.237978,-69.786123
 RFZY99,Planta San Gabriel,,,En tránsito,05-20 06:32,-35.831106,-71.640983
 PZDJ58,Planta San Gabriel,,,En tránsito,05-23 06:18,-35.83062,-71.64032
@@ -61,16 +61,16 @@ PZDJ63,Planta San Gabriel,,,En tránsito,05-20 06:53,-35.831142,-71.641048
 SVLV55,D&C ,,,En tránsito,05-27 02:16,-33.591231,-71.583717
 SPVR14,D&C ,,,En tránsito,05-27 02:13,-33.59127,-71.583492
 SVLV55E,Fuera de zona,,,Sin señal,No disponible,,
-SVLV46,Fuera de zona,,,Fuera de zona,05-27 02:19,-34.729204,-71.036911
+SVLV46,Fuera de zona,,,Fuera de zona,05-27 02:21,-34.710479,-71.028473
 PJKT53,Fuera de zona,,,Fuera de zona,05-27 02:16,-35.832599,-71.64087
-PCLZ43,CMPC,,,En tránsito,05-27 02:20,-35.606703,-71.592923
+PCLZ43,CMPC,,,En tránsito,05-27 02:21,-35.606703,-71.592923
 PZDJ87,Fuera de zona,,,Fuera de zona,05-27 02:12,-33.33897,-70.715157
 PZDJ56,Taller Externo,,,En tránsito,05-27 02:18,-35.525685,-71.488951
 PZDJ57,Fuera de zona,,,Fuera de zona,05-27 02:19,-33.338097,-70.713267
-PZDJ85,Fuera de zona,,,Fuera de zona,05-27 02:19,-34.723982,-71.034703
+PZDJ85,Fuera de zona,,,Fuera de zona,05-27 02:21,-34.706331,-71.026565
 PJKT44,Planta San Gabriel,,,En tránsito,05-27 02:15,-35.831499,-71.641025
 PJKT50,Fuera de zona,,,Fuera de zona,05-27 02:15,-35.839126,-71.648189
-PJKT54,Planta San Gabriel,,,En tránsito,05-27 02:20,-35.830558,-71.641656
+PJKT54,Planta San Gabriel,,,En tránsito,05-27 02:21,-35.830558,-71.641656
 PJKT52,Fuera de zona,,,Fuera de zona,05-27 02:16,-33.387547,-70.763539
 PZDJ61,Planta ABI,,,En tránsito,05-27 02:18,-33.338736,-70.714488
 PJKT42,Planta San Gabriel,,,En tránsito,05-27 02:12,-35.831257,-71.640973
@@ -82,7 +82,7 @@ PZDJ89,Planta San Gabriel,,,En tránsito,05-27 02:15,-35.83128,-71.640936
 PZDJ68,Planta San Gabriel,,,En tránsito,05-27 02:14,-35.831169,-71.640937
 PCLZ36,Fuera de zona,,,Fuera de zona,05-27 02:12,-33.388076,-70.763217
 PZDJ60,Fuera de zona,,,Sin señal,No disponible,,
-PJKT43,D&C ,,,En tránsito,05-27 02:15,-33.589982,-71.58502
+PJKT43,D&C ,,,En tránsito,05-27 02:21,-33.590614,-71.584487
 PZDJ69,Taller SG,,,En tránsito,05-27 02:11,-35.839035,-71.648186
 SVLV56,CMPC,,,En tránsito,05-27 02:19,-35.60567,-71.593615
 KZXJ72,Fuera de zona,,,Fuera de zona,05-27 02:13,-29.057715,-70.905666
