@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Panel Torre de Transportes</title>
+  <title>Tabla con Filtro y Semáforo</title>
   <style>
     body {
       background-color: #111;
@@ -26,6 +26,18 @@
       padding: 10px;
       border-bottom: 1px solid #444;
     }
+    .sem-verde {
+      color: #00ff00;
+      font-weight: bold;
+    }
+    .sem-amarillo {
+      color: #ffff00;
+      font-weight: bold;
+    }
+    .sem-rojo {
+      color: #ff4c4c;
+      font-weight: bold;
+    }
     .boton-filtro {
       background-color: #333;
       border: 1px solid #555;
@@ -45,19 +57,13 @@
       border-color: #FFD700;
       font-weight: bold;
     }
-    .verde { color: #00ff00; }
-    .amarillo { color: #ffff00; }
-    .rojo { color: #ff4c4c; }
-    .gray { color: #ccc; }
   </style>
 </head>
 <body>
 
   <div id="filtros">
     <button class="boton-filtro activo" id="btnTodos">Todos</button>
-    <button class="boton-filtro" id="btnAsignados">Asignados</button>
-    <button class="boton-filtro" id="btnDespacho">Despacho</button>
-    <button class="boton-filtro" id="btnRetorno">Retorno</button>
+    <!-- Aquí se pueden agregar más botones de filtro si quieres -->
   </div>
 
   <table>
@@ -65,61 +71,73 @@
       <tr>
         <th>Patente</th>
         <th>Ruta</th>
-        <th>Hora Salida</th>
-        <th>ETA</th>
         <th>Semáforo</th>
         <th>Última Actualización</th>
       </tr>
     </thead>
-    <tbody id="tablaDatos">
-      <tr><td colspan="6" style="text-align:center;">Cargando datos...</td></tr>
-    </tbody>
+    <tbody id="tablaDatos"></tbody>
   </table>
 
   <script>
-    // Datos de ejemplo, solo "Todos"
-    const datosTodos = [
-      ["PJJV29", "Fuera de zona", "Fuera de zona", "05-27 10:03", "-32.307419", "-71.461304"],
-      ["LXHJ99", "Planta San Gabriel", "En tránsito", "05-27 09:08", "-35.831262", "-71.640451"],
-      ["LZRG89", "Fuera de zona", "Fuera de zona", "05-27 21:23", "-29.566827", "-71.245071"],
-      ["PSLY21", "Fuera de zona", "Fuera de zona", "05-27 21:23", "-40.80033", "-73.16544"],
-      ["PGBY32", "PLANTA CHILLAN IDEAL", "En tránsito", "05-27 21:22", "-36.706504", "-72.271178"],
-      ["RHDX20", "D&C", "En tránsito", "05-27 21:23", "-33.591433", "-71.583944"],
-      ["PFBS17", "Planta San Gabriel", "En tránsito", "05-27 21:23", "-35.831059", "-71.640895"],
-      ["LXHJ98", "IDEAL_ANTOFAGASTA", "En tránsito", "05-27 21:21", "-23.619423", "-70.388821"],
-      ["LTGY82", "Fuera de zona", "Fuera de zona", "05-27 21:23", "-39.493771", "-72.8086"]
+    // Datos base con solo los campos necesarios y simulando semáforo por latitud (columna 4)
+    const datos = [
+      { patente: "PJJV29", ruta: "Fuera de zona", semaforoLat: "-32.307419", ultimaActualizacion: "05-27 10:03" },
+      { patente: "LXHJ99", ruta: "Planta San Gabriel", semaforoLat: "-35.831262", ultimaActualizacion: "05-27 09:08" },
+      { patente: "LZRG89", ruta: "Fuera de zona", semaforoLat: "-29.566827", ultimaActualizacion: "05-27 21:23" },
+      { patente: "PSLY21", ruta: "Fuera de zona", semaforoLat: "-40.80033", ultimaActualizacion: "05-27 21:23" },
+      { patente: "PGBY32", ruta: "PLANTA CHILLAN IDEAL", semaforoLat: "-36.706504", ultimaActualizacion: "05-27 21:22" },
+      { patente: "RHDX20", ruta: "D&C", semaforoLat: "-33.591433", ultimaActualizacion: "05-27 21:23" },
+      { patente: "PFBS17", ruta: "Planta San Gabriel", semaforoLat: "-35.831059", ultimaActualizacion: "05-27 21:23" },
+      { patente: "LXHJ98", ruta: "IDEAL_ANTOFAGASTA", semaforoLat: "-23.619423", ultimaActualizacion: "05-27 21:21" },
+      { patente: "LTGY82", ruta: "Fuera de zona", semaforoLat: "-39.493771", ultimaActualizacion: "05-27 21:23" }
     ];
 
-    function mostrarDatos(datos) {
+    // Función para decidir color semáforo basado en latitud (ejemplo)
+    function calcularSemaforo(lat) {
+      const latNum = parseFloat(lat);
+      if (latNum < -35) return 'rojo';
+      if (latNum >= -35 && latNum <= -30) return 'amarillo';
+      return 'verde';
+    }
+
+    function mostrarDatos(datosMostrar) {
       const tbody = document.getElementById('tablaDatos');
       tbody.innerHTML = '';
-      datos.forEach(fila => {
+
+      datosMostrar.forEach(({ patente, ruta, semaforoLat, ultimaActualizacion }) => {
         const tr = document.createElement('tr');
-        fila.forEach((celda, idx) => {
-          const td = document.createElement('td');
-          // Puedes agregar lógica de color según Semáforo (índice 4) si quieres aquí
-          td.textContent = celda;
-          tr.appendChild(td);
-        });
+
+        // Patente
+        const tdPatente = document.createElement('td');
+        tdPatente.textContent = patente;
+        tr.appendChild(tdPatente);
+
+        // Ruta
+        const tdRuta = document.createElement('td');
+        tdRuta.textContent = ruta;
+        tr.appendChild(tdRuta);
+
+        // Semáforo
+        const tdSemaforo = document.createElement('td');
+        const color = calcularSemaforo(semaforoLat);
+        tdSemaforo.textContent = '●';
+        tdSemaforo.classList.add(`sem-${color}`);
+        tr.appendChild(tdSemaforo);
+
+        // Última Actualización
+        const tdUltima = document.createElement('td');
+        tdUltima.textContent = ultimaActualizacion;
+        tr.appendChild(tdUltima);
+
         tbody.appendChild(tr);
       });
     }
 
-    // Inicializo mostrando "Todos"
-    mostrarDatos(datosTodos);
+    // Inicializar con todos los datos
+    mostrarDatos(datos);
 
-    // Aquí puedes enlazar botones para otros filtros (vacíos por ahora)
-    document.getElementById('btnTodos').addEventListener('click', () => {
-      setActiveButton('btnTodos');
-      mostrarDatos(datosTodos);
-    });
-    // Para Asignados, Despacho, Retorno, puedes usar arrays y funciones similares
+    // Aquí podrías agregar lógica para los filtros, si quieres
 
-    function setActiveButton(idActivo) {
-      document.querySelectorAll('.boton-filtro').forEach(btn => {
-        btn.classList.toggle('activo', btn.id === idActivo);
-      });
-    }
   </script>
 
 </body>
