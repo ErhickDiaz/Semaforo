@@ -9,11 +9,16 @@
       color: white;
       font-family: 'Courier New', monospace;
       padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     table {
-      width: 100%;
+      width: 90%;
+      max-width: 1200px;
       border-collapse: collapse;
       font-size: 1.5rem;
+      margin-top: 20px;
     }
     th {
       color: #FFD700;
@@ -28,10 +33,6 @@
     .amarillo { color: #ffff00; }
     .rojo { color: #ff4c4c; }
     .gray { color: #ccc; }
-    .fecha-actualizacion {
-      font-family: monospace;
-      color: #aaa;
-    }
     #reloj {
       font-size: 2rem;
       position: absolute;
@@ -39,7 +40,7 @@
       right: 40px;
     }
     #filtros {
-      margin-bottom: 20px;
+      margin-top: 20px;
     }
     .boton-filtro {
       background-color: #333;
@@ -62,6 +63,10 @@
       border-color: #FFD700;
       font-weight: bold;
     }
+    .fecha-actualizacion {
+      font-family: monospace;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
@@ -69,23 +74,14 @@
   <div id="filtros"></div>
   <table id="panel">
     <thead>
-      <tr>
-        <th>Patente</th>
-        <th>Ruta</th>
-        <th>Semáforo</th>
-        <th>Última Actualización</th>
-        <th>Latitud</th>
-        <th>Longitud</th>
+      <tr id="encabezado">
+        <!-- Encabezados dinámicos -->
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
   <script>
-    let datosViajes = [];
-    let asignados = [];
-    let filtroActivo = 'Todos';
-
     function actualizarReloj() {
       const ahora = new Date();
       const hora = ahora.getHours().toString().padStart(2, '0');
@@ -99,71 +95,73 @@
       estado = estado.toLowerCase();
       if (estado.includes("fuera de zona")) return "rojo";
       if (estado.includes("en tránsito") || estado === "sin iniciar") return "amarillo";
-      if (estado.includes("planta") || estado.includes("ideal") || estado.includes("cd") || estado.includes("d&c")) return "verde";
+      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal") || estado.includes("d&c")) return "verde";
       if (estado === "sin datos") return "rojo";
       return "gray";
     }
 
-    function filtrarDatos() {
-      if (filtroActivo === 'Todos') {
-        return datosViajes;
-      }
-      if (filtroActivo === 'Asignado') {
-        return datosViajes.filter(d => asignados.includes(d[0].trim().toUpperCase()));
-      }
-      if (filtroActivo === 'Carga') {
-        return datosViajes.filter(d => d[1].toLowerCase().includes('carga'));
-      }
-      if (filtroActivo === 'Despacho') {
-        return datosViajes.filter(d => d[1].toLowerCase().includes('despacho'));
-      }
-      if (filtroActivo === 'Retorno') {
-        return datosViajes.filter(d => d[1].toLowerCase().includes('retorno'));
-      }
-      return datosViajes;
+    let datosViajes = [];
+    let asignados = [];
+    let datosRutas = [];
+
+    let filtroActivo = 'Todos';
+
+    const columnasPorFiltro = {
+      "Todos": ["Patente", "Ruta", "Semáforo", "Última Actualización"],
+      "Asignado": ["Patente", "Ruta", "Semáforo", "Última Actualización"],
+      "Carga": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
+      "Despacho": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
+      "Retorno": ["Patente", "ETA", "Última Actualización"]
+    };
+
+    function mostrarEncabezado() {
+      const theadTr = document.getElementById('encabezado');
+      theadTr.innerHTML = '';
+      columnasPorFiltro[filtroActivo].forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col;
+        theadTr.appendChild(th);
+      });
     }
 
-    function mostrarDatos() {
+    function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
-      const datosFiltrados = filtrarDatos();
 
-      datosFiltrados.forEach(cols => {
-        const tr = document.createElement('tr');
+      datos.forEach(cols => {
+        const fila = document.createElement('tr');
 
-        // Patente
-        let td = document.createElement('td');
-        td.textContent = cols[0];
-        tr.appendChild(td);
+        columnasPorFiltro[filtroActivo].forEach(col => {
+          const td = document.createElement('td');
+          let valor = '-';
+          switch (col) {
+            case "Patente":
+              valor = cols[0] || '-';
+              break;
+            case "Ruta":
+              valor = cols[1] || '-';
+              break;
+            case "Hora Salida":
+              valor = cols[2] || '-';
+              break;
+            case "ETA":
+              valor = cols[3] || '-';
+              break;
+            case "Semáforo":
+              valor = cols[4] || 'sin datos';
+              td.className = obtenerColor(valor);
+              break;
+            case "Última Actualización":
+              valor = cols[5] || '-';
+              td.className = 'fecha-actualizacion';
+              break;
+          }
 
-        // Ruta
-        td = document.createElement('td');
-        td.textContent = cols[1];
-        tr.appendChild(td);
+          td.textContent = valor;
+          fila.appendChild(td);
+        });
 
-        // Semáforo
-        td = document.createElement('td');
-        td.textContent = cols[2];
-        td.className = obtenerColor(cols[2]);
-        tr.appendChild(td);
-
-        // Última Actualización
-        td = document.createElement('td');
-        td.textContent = cols[3];
-        td.className = 'fecha-actualizacion';
-        tr.appendChild(td);
-
-        // Latitud
-        td = document.createElement('td');
-        td.textContent = cols[4];
-        tr.appendChild(td);
-
-        // Longitud
-        td = document.createElement('td');
-        td.textContent = cols[5];
-        tr.appendChild(td);
-
-        tbody.appendChild(tr);
+        tbody.appendChild(fila);
       });
     }
 
@@ -171,17 +169,24 @@
       const contenedor = document.getElementById('filtros');
       contenedor.innerHTML = '';
 
-      const filtros = ['Todos', 'Asignado', 'Carga', 'Despacho', 'Retorno'];
+      const filtros = [
+        { nombre: 'Todos', func: mostrarTodos },
+        { nombre: 'Asignado', func: filtrarAsignados },
+        { nombre: 'Carga', func: filtrarCarga },
+        { nombre: 'Despacho', func: filtrarDespacho },
+        { nombre: 'Retorno', func: filtrarRetorno }
+      ];
 
-      filtros.forEach(nombre => {
+      filtros.forEach(filtro => {
         const btn = document.createElement('button');
-        btn.textContent = nombre;
+        btn.textContent = filtro.nombre;
         btn.className = 'boton-filtro';
-        if (nombre === filtroActivo) btn.classList.add('activo');
+        if (filtro.nombre === filtroActivo) btn.classList.add('activo');
         btn.onclick = () => {
-          filtroActivo = nombre;
+          filtroActivo = filtro.nombre;
           marcarBotonActivo();
-          mostrarDatos();
+          mostrarEncabezado();
+          filtro.func();
         };
         contenedor.appendChild(btn);
       });
@@ -194,33 +199,70 @@
       });
     }
 
+    function mostrarTodos() {
+      const datos = datosViajes.map(cols => [cols[0], cols[1], cols[2], cols[3]]);
+      mostrarFilas(datos);
+    }
+
+    function filtrarAsignados() {
+      const filtrado = datosViajes
+        .filter(cols => asignados.includes(cols[0].trim().toUpperCase()))
+        .map(cols => [cols[0], cols[1], cols[2], cols[3]]);
+      mostrarFilas(filtrado);
+    }
+
+    function filtrarCarga() {
+      const filtrado = datosViajes
+        .filter(cols => cols[1].toLowerCase().includes('carga'));
+      mostrarFilas(filtrado);
+    }
+
+    function filtrarDespacho() {
+      const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
+      const filtrado = datosViajes
+        .filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
+      mostrarFilas(filtrado);
+    }
+
+    function filtrarRetorno() {
+      const filtrado = datosViajes.map(cols => [cols[0], cols[3], cols[5]]);
+      mostrarFilas(filtrado);
+    }
+
     async function cargarDatos() {
       try {
-        // Cargar asignados para filtro
         const responseAsignados = await fetch('asignado.csv');
         const dataAsignados = await responseAsignados.text();
-        asignados = dataAsignados.trim().split('\n').map(l => l.trim().toUpperCase());
+        asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
 
-        // Cargar viajes
-        const response = await fetch('viajes.csv');
-        const data = await response.text();
+        const responseViajes = await fetch('viajes.csv');
+        const dataViajes = await responseViajes.text();
+        const filasViajes = dataViajes.trim().split('\n');
+        filasViajes.shift();
+        datosViajes = filasViajes.map(fila => {
+          let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
+          return cols.map(c => c.trim());
+        });
 
-        const filas = data.trim().split('\n');
-        filas.shift(); // quitar encabezado
-        datosViajes = filas.map(fila => {
+        const responseRutas = await fetch('rutas.csv');
+        const dataRutas = await responseRutas.text();
+        const filasRutas = dataRutas.trim().split('\n');
+        filasRutas.shift();
+        datosRutas = filasRutas.map(fila => {
           let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
           return cols.map(c => c.trim());
         });
 
         crearBotonesFiltro();
-        mostrarDatos();
+        mostrarEncabezado();
+        mostrarTodos();
       } catch (error) {
         console.error('Error cargando datos:', error);
       }
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 600000);
+    setInterval(cargarDatos, 600000); // actualizar cada 10 minutos
   </script>
 </body>
 </html>
