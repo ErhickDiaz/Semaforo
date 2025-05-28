@@ -1,12 +1,12 @@
 Transporte,Ruta,Hora Salida,ETA,Semáforo,Última Actualización,Latitud,Longitud
-PJJV29,Fuera de zona,,,Fuera de zona,05-27 14:03,-32.307419,-71.461304
-LZRG89,Fuera de zona,,,Fuera de zona,05-28 00:21,-30.00196,-71.378121
-PSLY21,Fuera de zona,,,Fuera de zona,05-28 00:21,-40.090488,-72.86504
-JJWG66,Fuera de zona,,,Fuera de zona,05-28 00:21,-35.623754,-71.701302
-PSLY20,IDEAL_LA SERENA,,,En tránsito,05-28 00:18,-29.966269,-71.267086
-JJWG93,CD IDEAL,,,En tránsito,05-28 00:18,-33.324442,-70.712675
-LCTB55,Fuera de zona,,,Fuera de zona,05-28 00:21,-36.035883,-71.755826
-RHDX19,Taller SG,,,En tránsito,05-28 00:21,-35.838864,-71.648414
-PFBS12,Fuera de zona,,,Fuera de zona,05-28 00:21,-35.04937,-71.280159
-RHDX18,CD IDEAL,,,En tránsito,05-28 00:21,-33.324199,-70.712638
-PGKD18,Fuera de zona,,,Fuera de zona,05-28 00:21,-34.038179,-70.705935
+PJJV29,Fuera de zona,,02:16,Fuera de zona,05-27 14:03,-32.307419,-71.461304
+LZRG89,Fuera de zona,,05:00,Fuera de zona,05-28 00:25,-29.977927,-71.346142
+PSLY21,Fuera de zona,,09:22,Fuera de zona,05-28 00:25,-40.147807,-72.882082
+JJWG66,Fuera de zona,,03:32,Fuera de zona,05-28 00:26,-35.681621,-71.688696
+PSLY20,IDEAL_LA SERENA,,05:16,En tránsito,05-28 00:24,-29.966269,-71.267086
+JJWG93,CD IDEAL,,00:28,En tránsito,05-28 00:26,-33.324396,-70.712725
+LCTB55,Fuera de zona,,04:01,Fuera de zona,05-28 00:26,-36.0883,-71.79205
+RHDX19,Taller SG,,03:44,En tránsito,05-28 00:21,-35.838864,-71.648414
+PFBS12,Fuera de zona,,02:51,Fuera de zona,05-28 00:26,-35.099917,-71.323444
+RHDX18,CD IDEAL,,00:28,En tránsito,05-28 00:26,-33.324199,-70.712638
+PGKD18,Fuera de zona,,01:39,Fuera de zona,05-28 00:26,-34.099115,-70.719915
