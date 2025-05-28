@@ -24,10 +24,6 @@
       padding: 10px;
       border-bottom: 1px solid #444;
     }
-    th:nth-child(6),
-    td:nth-child(6) {
-      text-align: center;
-    }
     .verde { color: #00ff00; }
     .amarillo { color: #ffff00; }
     .rojo { color: #ff4c4c; }
@@ -63,7 +59,6 @@
       font-weight: bold;
     }
     .fecha-actualizacion {
-      text-align: right;
       font-family: monospace;
       color: #aaa;
     }
@@ -74,13 +69,8 @@
   <div id="filtros"></div>
   <table id="panel">
     <thead>
-      <tr>
-        <th>Patente</th>
-        <th>Ruta</th>
-        <th>Hora Salida</th>
-        <th>ETA</th>
-        <th>Semáforo</th>
-        <th>Última Actualización</th>
+      <tr id="encabezado">
+        <!-- Los encabezados se actualizarán dinámicamente -->
       </tr>
     </thead>
     <tbody></tbody>
@@ -100,7 +90,7 @@
       estado = estado.toLowerCase();
       if (estado.includes("fuera de zona")) return "rojo";
       if (estado.includes("en tránsito") || estado === "sin iniciar") return "amarillo";
-      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal")) return "verde";
+      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal") || estado.includes("d&c")) return "verde";
       if (estado === "sin datos") return "rojo";
       return "gray";
     }
@@ -111,61 +101,64 @@
 
     let filtroActivo = 'Todos';
 
-    // Mostrar filas general, con opción de columnas específicas
-    function mostrarFilas(datos, columnas = null) {
-      const tbody = document.querySelector('#panel tbody');
-      tbody.innerHTML = '';
-      datos.forEach(cols => {
-        // Si columnas definido, usar solo esas columnas
-        let fila = columnas ? columnas.map(i => cols[i] || '-') : cols;
+    // Define las columnas que se muestran según el filtro
+    const columnasPorFiltro = {
+      "Todos": ["Patente", "Ruta", "Semáforo", "Última Actualización"],
+      "Asignados": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
+      "Despacho": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
+      "Retorno": ["Patente", "ETA", "Última Actualización"]
+    };
 
-        // Para el Semáforo usamos la columna 4 (si columnas está definido, puede cambiar índice)
-        // Encontramos el índice real de Semáforo en la fila mostrada:
-        let semaforoIdx = columnas ? columnas.indexOf(4) : 4;
-        let semaforoValor = fila[semaforoIdx] || 'sin datos';
-
-        if (fila.length === 4) {
-          // Mostrar solo Patente, Ruta, Semáforo y Última Actualización
-          tbody.innerHTML += `
-            <tr>
-              <td>${fila[0]}</td>
-              <td>${fila[1]}</td>
-              <td class="${obtenerColor(semaforoValor)}">${fila[2]}</td>
-              <td>${fila[3]}</td>
-            </tr>`;
-        } else {
-          // Mostrar todas las columnas
-          tbody.innerHTML += `
-            <tr>
-              <td>${fila[0]}</td>
-              <td>${fila[1]}</td>
-              <td>${fila[2]}</td>
-              <td>${fila[3]}</td>
-              <td class="${obtenerColor(semaforoValor)}">${fila[4]}</td>
-              <td>${fila[5]}</td>
-            </tr>`;
-        }
+    function mostrarEncabezado() {
+      const theadTr = document.getElementById('encabezado');
+      theadTr.innerHTML = '';
+      columnasPorFiltro[filtroActivo].forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col;
+        theadTr.appendChild(th);
       });
     }
 
-    function mostrarFilasRetorno(datos) {
+    function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
-      datos.forEach(cols => {
-        const patente = cols[0];
-        const eta = cols[1] || '-';
-        const ultimaAct = cols[2] || '-';
 
-        const tr = `
-          <tr>
-            <td>${patente}</td>
-            <td>-</td>  <!-- ocultamos Ruta -->
-            <td>-</td>  <!-- ocultamos Hora Salida -->
-            <td>${eta}</td>
-            <td>-</td>  <!-- ocultamos Semáforo -->
-            <td class="fecha-actualizacion">${ultimaAct}</td>
-          </tr>`;
-        tbody.innerHTML += tr;
+      datos.forEach(cols => {
+        const fila = document.createElement('tr');
+
+        columnasPorFiltro[filtroActivo].forEach(col => {
+          const td = document.createElement('td');
+
+          // Mapeo de columnas para los índices de datosViajes (según csv: Patente=0, Ruta=1, Hora Salida=2, ETA=3, Semáforo=4, Última Actualización=5)
+          let valor = '-';
+          switch(col) {
+            case "Patente":
+              valor = cols[0] || '-';
+              break;
+            case "Ruta":
+              valor = cols[1] || '-';
+              break;
+            case "Hora Salida":
+              valor = cols[2] || '-';
+              break;
+            case "ETA":
+              valor = cols[3] || '-';
+              break;
+            case "Semáforo":
+              valor = cols[4] || 'sin datos';
+              td.className = obtenerColor(valor);
+              break;
+            case "Última Actualización":
+              valor = cols[5] || '-';
+              td.className = 'fecha-actualizacion';
+              break;
+          }
+
+          td.textContent = valor;
+          fila.appendChild(td);
+        });
+
+        tbody.appendChild(fila);
       });
     }
 
@@ -188,6 +181,7 @@
         btn.onclick = () => {
           filtroActivo = filtro.nombre;
           marcarBotonActivo();
+          mostrarEncabezado();
           filtro.func();
         };
         contenedor.appendChild(btn);
@@ -197,35 +191,32 @@
     function marcarBotonActivo() {
       const botones = document.querySelectorAll('.boton-filtro');
       botones.forEach(boton => {
-        if (boton.textContent === filtroActivo) {
-          boton.classList.add('activo');
-        } else {
-          boton.classList.remove('activo');
-        }
+        boton.classList.toggle('activo', boton.textContent === filtroActivo);
       });
     }
 
+    // Muestra todos los datos del archivo viajes
+    function mostrarTodos() {
+      mostrarFilas(datosViajes);
+    }
+
+    // Muestra solo los asignados que están en asignados.csv
     function filtrarAsignados() {
       const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
       mostrarFilas(filtrado);
     }
 
+    // Muestra solo las patentes que estén en rutas.csv
     function filtrarDespacho() {
       const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
       const filtrado = datosViajes.filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
       mostrarFilas(filtrado);
     }
 
+    // Muestra solo columnas Patente, ETA y Última Actualización para retorno
     function filtrarRetorno() {
-      // Mostrar solo Transporte, ETA y Última Actualización
       const filtrado = datosViajes.map(cols => [cols[0], cols[3], cols[5]]);
-      mostrarFilasRetorno(filtrado);
-    }
-
-    // Mostrar todos con solo columnas específicas
-    function mostrarTodos() {
-      // columnas: Patente(0), Ruta(1), Semáforo(4), Última Actualización(5)
-      mostrarFilas(datosViajes, [0,1,4,5]);
+      mostrarFilas(filtrado);
     }
 
     async function cargarDatos() {
@@ -245,7 +236,7 @@
           return cols.map(c => c.trim());
         });
 
-        // Cargar rutas (para filtro despacho)
+        // Cargar rutas
         const responseRutas = await fetch('rutas.csv');
         const dataRutas = await responseRutas.text();
         const filasRutas = dataRutas.trim().split('\n');
@@ -256,13 +247,15 @@
         });
 
         crearBotonesFiltro();
-        mostrarTodos(); // Mostrar todos por defecto al inicio
+        mostrarEncabezado();
+        mostrarTodos();  // Mostrar TODOS al cargar la página
       } catch (error) {
         console.error('Error cargando datos:', error);
       }
     }
 
     cargarDatos();
+    setInterval(cargarDatos, 600000); // actualizar cada 10 minutos
   </script>
 </body>
 </html>
