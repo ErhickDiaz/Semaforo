@@ -2,158 +2,152 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Panel Torre de Transportes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monitor de Viajes</title>
   <style>
     body {
-      background-color: #111;
-      color: white;
-      font-family: 'Courier New', monospace;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    }
+    .filtro-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .centrado {
+      max-width: 800px;
+      margin: 0 auto;
     }
     table {
-      width: 90%;
-      max-width: 1200px;
+      width: 100%;
       border-collapse: collapse;
-      font-size: 1.5rem;
-      margin-top: 20px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
     }
     th {
-      color: #FFD700;
-      text-align: left;
-      padding: 10px;
-    }
-    td {
-      padding: 10px;
-      border-bottom: 1px solid #444;
-    }
-    .verde { color: #00ff00; }
-    .amarillo { color: #ffff00; }
-    .rojo { color: #ff4c4c; }
-    .gray { color: #ccc; }
-    #reloj {
-      font-size: 2rem;
-      position: absolute;
-      top: 20px;
-      right: 40px;
-    }
-    #filtros {
-      margin-top: 20px;
-    }
-    .boton-filtro {
       background-color: #333;
-      border: 1px solid #555;
       color: white;
-      padding: 8px 15px;
-      margin: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      border-radius: 4px;
-      transition: background-color 0.3s, box-shadow 0.3s;
     }
-    .boton-filtro:hover {
-      background-color: #555;
+    .verde {
+      background-color: #c8e6c9;
     }
-    .boton-filtro.activo {
-      background-color: #FFD700;
-      color: #111;
-      box-shadow: 0 0 10px #FFD700;
-      border-color: #FFD700;
-      font-weight: bold;
+    .amarillo {
+      background-color: #fff9c4;
+    }
+    .rojo {
+      background-color: #ffcdd2;
+    }
+    .sin-datos {
+      background-color: #e0e0e0;
     }
     .fecha-actualizacion {
-      font-family: monospace;
-      color: #aaa;
+      font-size: 0.9em;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <div id="reloj"></div>
-  <div id="filtros"></div>
-  <table id="panel">
-    <thead>
-      <tr id="encabezado">
-        <!-- Encabezados dinámicos -->
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="filtro-container">
+    <label for="filtro">Filtrar por tipo: </label>
+    <select id="filtro">
+      <option value="Todos">Todos</option>
+      <option value="Asignado">Asignado</option>
+      <option value="Carga">Carga</option>
+      <option value="Despacho">Despacho</option>
+      <option value="Retorno">Retorno</option>
+    </select>
+  </div>
+
+  <div id="contenedor-tabla" class="centrado">
+    <table id="tabla">
+      <thead>
+        <tr id="encabezado"></tr>
+      </thead>
+      <tbody id="cuerpo"></tbody>
+    </table>
+  </div>
 
   <script>
-    function actualizarReloj() {
-      const ahora = new Date();
-      const hora = ahora.getHours().toString().padStart(2, '0');
-      const minutos = ahora.getMinutes().toString().padStart(2, '0');
-      document.getElementById('reloj').textContent = `${hora}:${minutos}`;
-    }
-    setInterval(actualizarReloj, 1000);
-    actualizarReloj();
+    const encabezadosTodosAsignado = ["Patente", "Ruta", "Semáforo", "Última Actualización"];
+    const encabezadosCompleto = ["Patente", "Ruta", "Semáforo", "Última Actualización", "Latitud", "Longitud"];
+    const cuerpoTabla = document.getElementById("cuerpo");
+    const encabezadoTabla = document.getElementById("encabezado");
+    const contenedor = document.getElementById("contenedor-tabla");
+    const filtro = document.getElementById("filtro");
 
-    function obtenerColor(estado) {
-      estado = estado.toLowerCase();
-      if (estado.includes("fuera de zona")) return "rojo";
-      if (estado.includes("en tránsito") || estado === "sin iniciar") return "amarillo";
-      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal") || estado.includes("d&c")) return "verde";
-      if (estado === "sin datos") return "rojo";
-      return "gray";
+    async function cargarDatos() {
+      const response = await fetch("viajes.csv");
+      const texto = await response.text();
+      const lineas = texto.trim().split("\n").slice(1); // quitar encabezado CSV
+      return lineas.map(linea => linea.split(","));
     }
 
-    let datosViajes = [];
-    let asignados = [];
-    let datosRutas = [];
+    function obtenerColor(valor) {
+      if (valor.toLowerCase().includes("verde")) return "verde";
+      if (valor.toLowerCase().includes("amarillo")) return "amarillo";
+      if (valor.toLowerCase().includes("rojo")) return "rojo";
+      return "sin-datos";
+    }
 
-    let filtroActivo = 'Todos';
-
-    const columnasPorFiltro = {
-      "Todos": ["Patente", "Ruta", "Semáforo", "Última Actualización"],
-      "Asignado": ["Patente", "Ruta", "Semáforo", "Última Actualización"],
-      "Carga": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
-      "Despacho": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
-      "Retorno": ["Patente", "ETA", "Última Actualización"]
-    };
-
-    function mostrarEncabezado() {
-      const theadTr = document.getElementById('encabezado');
-      theadTr.innerHTML = '';
-      columnasPorFiltro[filtroActivo].forEach(col => {
-        const th = document.createElement('th');
-        th.textContent = col;
-        theadTr.appendChild(th);
+    function actualizarEncabezado(encabezados) {
+      encabezadoTabla.innerHTML = "";
+      encabezados.forEach(texto => {
+        const th = document.createElement("th");
+        th.textContent = texto;
+        encabezadoTabla.appendChild(th);
       });
     }
 
-    function mostrarFilas(datos) {
-      const tbody = document.querySelector('#panel tbody');
-      tbody.innerHTML = '';
+    function mostrarDatos(data, tipo) {
+      cuerpoTabla.innerHTML = "";
+      const encabezados = (tipo === "Todos" || tipo === "Asignado") ? encabezadosTodosAsignado : encabezadosCompleto;
+      actualizarEncabezado(encabezados);
 
-      datos.forEach(cols => {
-        const fila = document.createElement('tr');
+      // Centrar tabla solo para "Todos" o "Asignado"
+      if (tipo === "Todos" || tipo === "Asignado") {
+        contenedor.classList.add("centrado");
+      } else {
+        contenedor.classList.remove("centrado");
+      }
 
-        columnasPorFiltro[filtroActivo].forEach(col => {
-          const td = document.createElement('td');
-          let valor = '-';
-          switch (col) {
+      data.forEach(cols => {
+        if (cols.length < 4) return; // asegurarse de que hay suficientes columnas
+
+        // Filtro por tipo
+        if (tipo !== "Todos" && cols[1] !== tipo) return;
+
+        const fila = document.createElement("tr");
+
+        encabezados.forEach(col => {
+          const td = document.createElement("td");
+          let valor = "";
+
+          switch(col) {
             case "Patente":
-              valor = cols[0] || '-';
+              valor = cols[0] || "-";
               break;
             case "Ruta":
-              valor = cols[1] || '-';
-              break;
-            case "Hora Salida":
-              valor = cols[2] || '-';
-              break;
-            case "ETA":
-              valor = cols[3] || '-';
+              valor = cols[1] || "-";
               break;
             case "Semáforo":
-              valor = cols[4] || 'sin datos';
+              valor = cols[2] || "sin datos";
               td.className = obtenerColor(valor);
               break;
             case "Última Actualización":
-              valor = cols[5] || '-';
-              td.className = 'fecha-actualizacion';
+              valor = cols[3] || "-";
+              td.className = "fecha-actualizacion";
+              break;
+            case "Latitud":
+              valor = cols[4] || "-";
+              break;
+            case "Longitud":
+              valor = cols[5] || "-";
               break;
           }
 
@@ -161,108 +155,17 @@
           fila.appendChild(td);
         });
 
-        tbody.appendChild(fila);
+        cuerpoTabla.appendChild(fila);
       });
     }
 
-    function crearBotonesFiltro() {
-      const contenedor = document.getElementById('filtros');
-      contenedor.innerHTML = '';
-
-      const filtros = [
-        { nombre: 'Todos', func: mostrarTodos },
-        { nombre: 'Asignado', func: filtrarAsignados },
-        { nombre: 'Carga', func: filtrarCarga },
-        { nombre: 'Despacho', func: filtrarDespacho },
-        { nombre: 'Retorno', func: filtrarRetorno }
-      ];
-
-      filtros.forEach(filtro => {
-        const btn = document.createElement('button');
-        btn.textContent = filtro.nombre;
-        btn.className = 'boton-filtro';
-        if (filtro.nombre === filtroActivo) btn.classList.add('activo');
-        btn.onclick = () => {
-          filtroActivo = filtro.nombre;
-          marcarBotonActivo();
-          mostrarEncabezado();
-          filtro.func();
-        };
-        contenedor.appendChild(btn);
-      });
+    async function init() {
+      const datos = await cargarDatos();
+      filtro.addEventListener("change", () => mostrarDatos(datos, filtro.value));
+      mostrarDatos(datos, filtro.value);
     }
 
-    function marcarBotonActivo() {
-      const botones = document.querySelectorAll('.boton-filtro');
-      botones.forEach(boton => {
-        boton.classList.toggle('activo', boton.textContent === filtroActivo);
-      });
-    }
-
-    function mostrarTodos() {
-      const datos = datosViajes.map(cols => [cols[0], cols[1], cols[2], cols[3]]);
-      mostrarFilas(datos);
-    }
-
-    function filtrarAsignados() {
-      const filtrado = datosViajes
-        .filter(cols => asignados.includes(cols[0].trim().toUpperCase()))
-        .map(cols => [cols[0], cols[1], cols[2], cols[3]]);
-      mostrarFilas(filtrado);
-    }
-
-    function filtrarCarga() {
-      const filtrado = datosViajes
-        .filter(cols => cols[1].toLowerCase().includes('carga'));
-      mostrarFilas(filtrado);
-    }
-
-    function filtrarDespacho() {
-      const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
-      const filtrado = datosViajes
-        .filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
-      mostrarFilas(filtrado);
-    }
-
-    function filtrarRetorno() {
-      const filtrado = datosViajes.map(cols => [cols[0], cols[3], cols[5]]);
-      mostrarFilas(filtrado);
-    }
-
-    async function cargarDatos() {
-      try {
-        const responseAsignados = await fetch('asignado.csv');
-        const dataAsignados = await responseAsignados.text();
-        asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
-
-        const responseViajes = await fetch('viajes.csv');
-        const dataViajes = await responseViajes.text();
-        const filasViajes = dataViajes.trim().split('\n');
-        filasViajes.shift();
-        datosViajes = filasViajes.map(fila => {
-          let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-          return cols.map(c => c.trim());
-        });
-
-        const responseRutas = await fetch('rutas.csv');
-        const dataRutas = await responseRutas.text();
-        const filasRutas = dataRutas.trim().split('\n');
-        filasRutas.shift();
-        datosRutas = filasRutas.map(fila => {
-          let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-          return cols.map(c => c.trim());
-        });
-
-        crearBotonesFiltro();
-        mostrarEncabezado();
-        mostrarTodos();
-      } catch (error) {
-        console.error('Error cargando datos:', error);
-      }
-    }
-
-    cargarDatos();
-    setInterval(cargarDatos, 600000); // actualizar cada 10 minutos
+    init();
   </script>
 </body>
 </html>
