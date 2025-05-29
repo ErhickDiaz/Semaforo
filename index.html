@@ -65,6 +65,7 @@
     .fecha-actualizacion {
       font-family: monospace;
       color: #aaa;
+      text-align: center;
     }
   </style>
 </head>
@@ -88,28 +89,31 @@
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
 
-    function obtenerColor(estado) {
-      estado = estado.toLowerCase();
-      if (estado.includes("fuera de zona")) return "rojo";
-      if (estado.includes("en tránsito") || estado === "sin iniciar") return "amarillo";
-      if (estado.includes("cd") || estado.includes("planta") || estado.includes("ideal") || estado.includes("d&c")) return "verde";
-      if (estado === "sin datos") return "rojo";
-      return "gray";
+    function obtenerColorPorTiempos(programada, eta) {
+      if (!programada || !eta) return 'gray';
+      const hProgramada = new Date(`1970-01-01T${programada}:00`);
+      const hETA = new Date(`1970-01-01T${eta}:00`);
+      const diferencia = (hETA - hProgramada) / 60000; // minutos
+
+      if (diferencia <= -10) return 'verde';
+      if (diferencia <= 10) return 'amarillo';
+      return 'rojo';
     }
 
     let datosViajes = [];
     let asignados = [];
-    let datosRutas = [];
+    let datosCarga = [];
+    let datosDespacho = [];
+    let datosRetorno = [];
 
     let filtroActivo = 'Todos';
 
-    // Columnas por filtro, con solo las solicitadas para "Todos" y "Asignados"
     const columnasPorFiltro = {
       "Todos": ["Patente", "Ruta", "Semáforo", "Última Actualización"],
       "Asignados": ["Patente", "Ruta", "Semáforo", "Última Actualización"],
-      "Carga": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
-      "Despacho": ["Patente", "Ruta", "Hora Salida", "ETA", "Semáforo", "Última Actualización"],
-      "Retorno": ["Patente", "ETA", "Última Actualización"]
+      "Carga": ["Patente", "Hora Programada", "ETA", "Semáforo", "Última Actualización"],
+      "Despacho": ["Patente", "Hora Programada", "ETA", "Semáforo", "Última Actualización"],
+      "Retorno": ["Patente", "Hora Programada", "ETA", "Semáforo", "Última Actualización"]
     };
 
     function mostrarEncabezado() {
@@ -129,33 +133,21 @@
       datos.forEach(cols => {
         const fila = document.createElement('tr');
 
-        columnasPorFiltro[filtroActivo].forEach(col => {
+        columnasPorFiltro[filtroActivo].forEach((col, idx) => {
           const td = document.createElement('td');
-
           let valor = '-';
-          switch(col) {
-            case "Patente":
-              valor = cols[0] || '-';
-              break;
-            case "Ruta":
-              valor = cols[1] || '-';
-              break;
-            case "Hora Salida":
-              valor = cols[2] || '-';
-              break;
-            case "ETA":
-              valor = cols[3] || '-';
-              break;
-            case "Semáforo":
-              valor = cols[2] || cols[3] || 'sin datos'; // chequeo flexible para semáforo
-              if (filtroActivo === "Todos" || filtroActivo === "Asignados") valor = cols[2] || 'sin datos';
-              if (filtroActivo === "Carga" || filtroActivo === "Despacho") valor = cols[4] || 'sin datos';
-              td.className = obtenerColor(valor);
-              break;
-            case "Última Actualización":
-              valor = cols[3] || cols[5] || '-';
-              td.className = 'fecha-actualizacion';
-              break;
+
+          if (filtroActivo === 'Todos' || filtroActivo === 'Asignados') {
+            if (col === 'Patente') valor = cols[0];
+            if (col === 'Ruta') valor = cols[1];
+            if (col === 'Semáforo') { valor = cols[2]; td.className = valor; }
+            if (col === 'Última Actualización') { valor = cols[3]; td.className = 'fecha-actualizacion'; }
+          } else {
+            if (col === 'Patente') valor = cols[0];
+            if (col === 'Hora Programada') valor = cols[1];
+            if (col === 'ETA') valor = cols[2];
+            if (col === 'Semáforo') td.className = obtenerColorPorTiempos(cols[1], cols[2]);
+            if (col === 'Última Actualización') { valor = cols[3]; td.className = 'fecha-actualizacion'; }
           }
 
           td.textContent = valor;
@@ -172,10 +164,10 @@
 
       const filtros = [
         { nombre: 'Todos', func: mostrarTodos },
-        { nombre: 'Asignados', func: filtrarAsignados },
-        { nombre: 'Carga', func: filtrarCarga },
-        { nombre: 'Despacho', func: filtrarDespacho },
-        { nombre: 'Retorno', func: filtrarRetorno }
+        { nombre: 'Asignados', func: mostrarAsignados },
+        { nombre: 'Carga', func: mostrarCarga },
+        { nombre: 'Despacho', func: mostrarDespacho },
+        { nombre: 'Retorno', func: mostrarRetorno }
       ];
 
       filtros.forEach(filtro => {
@@ -200,57 +192,46 @@
       });
     }
 
-    function mostrarTodos() {
-      mostrarFilas(datosViajes);
-    }
+    const mostrarTodos = () => mostrarFilas(datosViajes);
 
-    function filtrarAsignados() {
+    const mostrarAsignados = () => {
       const filtrado = datosViajes.filter(cols => asignados.includes(cols[0].trim().toUpperCase()));
       mostrarFilas(filtrado);
-    }
+    };
 
-    function filtrarCarga() {
-      // Aquí puedes definir lógica específica para Carga si tienes datos
-      mostrarFilas(datosViajes); // Por ahora muestra todos (ajusta según necesites)
-    }
-
-    function filtrarDespacho() {
-      const patentesRutas = datosRutas.map(cols => cols[0].trim().toUpperCase());
-      const filtrado = datosViajes.filter(cols => patentesRutas.includes(cols[0].trim().toUpperCase()));
-      mostrarFilas(filtrado);
-    }
-
-    function filtrarRetorno() {
-      const filtrado = datosViajes.map(cols => [cols[0], cols[3], cols[5]]);
-      mostrarFilas(filtrado);
-    }
+    const mostrarCarga = () => mostrarFilas(datosCarga);
+    const mostrarDespacho = () => mostrarFilas(datosDespacho);
+    const mostrarRetorno = () => mostrarFilas(datosRetorno);
 
     async function cargarDatos() {
       try {
-        // Cargar asignados
         const responseAsignados = await fetch('asignado.csv');
         const dataAsignados = await responseAsignados.text();
         asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
 
-        // Cargar viajes
         const responseViajes = await fetch('viajes.csv');
         const dataViajes = await responseViajes.text();
         const filasViajes = dataViajes.trim().split('\n');
-        filasViajes.shift(); // quitar encabezado
-        datosViajes = filasViajes.map(fila => {
-          let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-          return cols.map(c => c.trim());
-        });
+        filasViajes.shift();
+        datosViajes = filasViajes.map(f => f.split(',').map(c => c.trim()));
 
-        // Cargar rutas
-        const responseRutas = await fetch('rutas.csv');
-        const dataRutas = await responseRutas.text();
-        const filasRutas = dataRutas.trim().split('\n');
-        filasRutas.shift(); // quitar encabezado
-        datosRutas = filasRutas.map(fila => {
-          let cols = fila.includes('\t') ? fila.split('\t') : fila.split(',');
-          return cols.map(c => c.trim());
-        });
+        const responseCarga = await fetch('carga.csv');
+        const dataCarga = await responseCarga.text();
+        const filasCarga = dataCarga.trim().split('\n');
+        filasCarga.shift();
+        datosCarga = filasCarga.map(f => f.split(',').map(c => c.trim()));
+
+        const responseDespacho = await fetch('despacho.csv');
+        const dataDespacho = await responseDespacho.text();
+        const filasDespacho = dataDespacho.trim().split('\n');
+        filasDespacho.shift();
+        datosDespacho = filasDespacho.map(f => f.split(',').map(c => c.trim()));
+
+        const responseRetorno = await fetch('retorno.csv');
+        const dataRetorno = await responseRetorno.text();
+        const filasRetorno = dataRetorno.trim().split('\n');
+        filasRetorno.shift();
+        datosRetorno = filasRetorno.map(f => f.split(',').map(c => c.trim()));
 
         crearBotonesFiltro();
         mostrarEncabezado();
@@ -261,7 +242,7 @@
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 10 * 60 * 1000); // actualizar cada 10 minutos
+    setInterval(cargarDatos, 10 * 60 * 1000);
   </script>
 </body>
 </html>
