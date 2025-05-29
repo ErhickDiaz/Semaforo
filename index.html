@@ -1,156 +1,108 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Panel de Transporte</title>
-<style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  th, td {
-    padding: 6px;
-    border: 1px solid #ddd;
-    text-align: center;
-  }
-  .semaforo-rojo {
-    background-color: #f44336;
-    color: white;
-  }
-  .semaforo-amarillo {
-    background-color: #ffeb3b;
-  }
-  .semaforo-verde {
-    background-color: #4caf50;
-    color: white;
-  }
-  .fecha-actualizacion {
-    font-style: italic;
-    font-size: 0.9em;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard de Transporte</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #1e1e1e;
+    }
+    .verde {
+      background-color: #4caf50;
+    }
+    .amarillo {
+      background-color: #ffeb3b;
+      color: black;
+    }
+    .rojo {
+      background-color: #f44336;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Panel de Transporte - Filtro Retorno</h2>
-
-<div>
-  <label for="filtro">Selecciona filtro: </label>
-  <select id="filtro" onchange="mostrarDatos()">
-    <option value="Retorno">Retorno</option>
-    <!-- otros filtros si aplican -->
-  </select>
-</div>
-
-<table id="tabla-datos">
-  <thead id="tabla-head"></thead>
-  <tbody id="tabla-body"></tbody>
+<h2>Dashboard de Transporte - Vista Retorno</h2>
+<table id="tabla">
+  <thead>
+    <tr>
+      <th>Patente</th>
+      <th>Hora Programada</th>
+      <th>ETA</th>
+      <th>Semáforo</th>
+      <th>Última Actualización</th>
+      <th>Paso Por Chillan</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
 </table>
 
 <script>
-  let datosRetorno = [];
-  let datosViajes = [];
-
-  const columnasPorFiltro = {
-    "Retorno": ["Patente", "Hora Programada", "ETA", "Semáforo", "Última Actualización", "Paso Por Chillan"]
-  };
-
-  // Función para cargar CSV (sin librerías externas)
-  async function cargarCSV(url, separador = ",") {
-    const respuesta = await fetch(url);
-    const texto = await respuesta.text();
-    const lineas = texto.trim().split('\n');
-    return lineas.map(linea => linea.split(separador).map(c => c.trim()));
+  async function cargarCSV(url, separador = ',') {
+    const resp = await fetch(url);
+    const texto = await resp.text();
+    return texto.trim().split('\n').map(linea => linea.split(separador));
   }
 
-  // Función para asignar clase semáforo según estado o tiempos
-  function obtenerClaseSemaforo(semaforo) {
-    switch (semaforo.toLowerCase()) {
-      case "rojo": return "semaforo-rojo";
-      case "amarillo": return "semaforo-amarillo";
-      case "verde": return "semaforo-verde";
-      default: return "";
-    }
+  function obtenerColorClase(valor) {
+    const v = valor.toLowerCase();
+    if (v === 'verde') return 'verde';
+    if (v === 'amarillo') return 'amarillo';
+    if (v === 'rojo') return 'rojo';
+    return '';
   }
 
   async function cargarDatos() {
-    // Carga retorno.csv (contiene paso_por_chillan)
-    datosRetorno = await cargarCSV('retorno.csv', ',');
+    const retorno = await cargarCSV('retorno.csv', ',');
+    const viajes = await cargarCSV('viajes.csv', ',');
 
-    // Carga viajes.csv (contiene ETA, Semáforo, Última actualización)
-    datosViajes = await cargarCSV('viajes.csv', ',');
-
-    // Crear mapa para lookup rápido por patente (asumo patente en columna 0 en ambos)
     const mapaViajes = new Map();
-    datosViajes.forEach(fila => {
-      const patente = fila[0].toUpperCase();
+    viajes.forEach(v => {
+      const patente = v[0].trim().toUpperCase();
       mapaViajes.set(patente, {
-        eta: fila[2] || "-",
-        semaforo: fila[3] || "-",
-        ultimaAct: fila[4] || "-"
+        eta: v[2] || '-',
+        semaforo: v[3] || '-',
+        actualizacion: v[4] || '-'
       });
     });
 
-    // Combinar datos para filtro Retorno: [Patente, Hora Prog, ETA, Semáforo, Última Actualización, Paso Por Chillan]
-    datosRetorno = datosRetorno.map(fila => {
-      const patente = fila[0].toUpperCase();
-      const horaProg = fila[2] || "-";
-      const pasoChillan = fila[3] || "NO";
-      const viaje = mapaViajes.get(patente) || {eta: "-", semaforo: "-", ultimaAct: "-"};
-      return [patente, horaProg, viaje.eta, viaje.semaforo, viaje.ultimaAct, pasoChillan];
-    });
-
-    mostrarDatos();
-  }
-
-  function mostrarDatos() {
-    const filtro = document.getElementById('filtro').value;
-    const columnas = columnasPorFiltro[filtro];
-
-    // Construir encabezado
-    const thead = document.getElementById('tabla-head');
-    thead.innerHTML = '';
-    const trHead = document.createElement('tr');
-    columnas.forEach(col => {
-      const th = document.createElement('th');
-      th.textContent = col;
-      trHead.appendChild(th);
-    });
-    thead.appendChild(trHead);
-
-    // Construir cuerpo
-    const tbody = document.getElementById('tabla-body');
+    const tbody = document.querySelector('#tabla tbody');
     tbody.innerHTML = '';
 
-    datosRetorno.forEach(fila => {
+    for (let i = 1; i < retorno.length; i++) {
+      const fila = retorno[i];
+      const patente = fila[0].trim().toUpperCase();
+      const hora = fila[2] || '-';
+      const chillan = fila[3] || 'NO';
+
+      const datos = mapaViajes.get(patente) || { eta: '-', semaforo: '-', actualizacion: '-' };
+
       const tr = document.createElement('tr');
-      columnas.forEach(col => {
-        const td = document.createElement('td');
-        let valor = "-";
-
-        switch(col) {
-          case "Patente": valor = fila[0]; break;
-          case "Hora Programada": valor = fila[1]; break;
-          case "ETA": valor = fila[2]; break;
-          case "Semáforo":
-            valor = fila[3];
-            td.className = obtenerClaseSemaforo(valor);
-            break;
-          case "Última Actualización": 
-            valor = fila[4];
-            td.className = 'fecha-actualizacion';
-            break;
-          case "Paso Por Chillan":
-            valor = fila[5];
-            break;
-        }
-
-        td.textContent = valor;
-        tr.appendChild(td);
-      });
+      tr.innerHTML = `
+        <td>${patente}</td>
+        <td>${hora}</td>
+        <td>${datos.eta}</td>
+        <td class="${obtenerColorClase(datos.semaforo)}">${datos.semaforo}</td>
+        <td>${datos.actualizacion}</td>
+        <td>${chillan}</td>
+      `;
       tbody.appendChild(tr);
-    });
+    }
   }
 
   cargarDatos();
