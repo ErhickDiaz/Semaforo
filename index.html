@@ -46,7 +46,6 @@
       <th>ETA</th>
       <th>Semáforo</th>
       <th>Última Actualización</th>
-      <th>Paso Por Chillan</th>
     </tr>
   </thead>
   <tbody></tbody>
@@ -88,7 +87,6 @@
       const fila = retorno[i];
       const patente = fila[0].trim().toUpperCase();
       const hora = fila[2] || '-';
-      const chillan = fila[3] || 'NO';
 
       const datos = mapaViajes.get(patente) || { eta: '-', semaforo: '-', actualizacion: '-' };
 
@@ -99,7 +97,6 @@
         <td>${datos.eta}</td>
         <td class="${obtenerColorClase(datos.semaforo)}">${datos.semaforo}</td>
         <td>${datos.actualizacion}</td>
-        <td>${chillan}</td>
       `;
       tbody.appendChild(tr);
     }
