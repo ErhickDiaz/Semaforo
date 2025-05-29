@@ -5,7 +5,7 @@
   <title>Panel Torre de Transportes</title>
   <style>
     body {
-      background-color: #111;
+      background-color: #121212; /* negro suave para mejor lectura */
       color: white;
       font-family: 'Courier New', monospace;
       padding: 20px;
@@ -23,6 +23,7 @@
       color: #FFD700;
       text-align: left;
       padding: 10px;
+      border-bottom: 2px solid #555;
     }
     td {
       padding: 10px;
@@ -66,13 +67,14 @@
       font-family: monospace;
       color: #aaa;
       text-align: center;
+      white-space: nowrap;
     }
   </style>
 </head>
 <body>
   <div id="reloj"></div>
   <div id="filtros"></div>
-  <table id="panel">
+  <table id="panel" aria-label="Tabla de transporte">
     <thead>
       <tr id="encabezado"></tr>
     </thead>
@@ -91,9 +93,13 @@
 
     function obtenerColorPorTiempos(programada, eta) {
       if (!programada || !eta || eta === '-' || programada === '-') return 'gray';
-      const hProgramada = new Date(`1970-01-01T${programada}:00`);
-      const hETA = new Date(`1970-01-01T${eta}:00`);
-      const diferencia = (hETA - hProgramada) / 60000; // diferencia en minutos
+      // Parsear solo horas y minutos para evitar problemas de fecha
+      const [ph, pm] = programada.split(':').map(Number);
+      const [eh, em] = eta.split(':').map(Number);
+      if ([ph, pm, eh, em].some(v => isNaN(v))) return 'gray';
+      const minutosProgramada = ph * 60 + pm;
+      const minutosETA = eh * 60 + em;
+      const diferencia = minutosETA - minutosProgramada;
 
       if (diferencia <= -10) return 'verde';
       if (diferencia <= 10) return 'amarillo';
@@ -129,6 +135,17 @@
     function mostrarFilas(datos) {
       const tbody = document.querySelector('#panel tbody');
       tbody.innerHTML = '';
+
+      if (!datos.length) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.setAttribute('colspan', columnasPorFiltro[filtroActivo].length);
+        td.style.textAlign = 'center';
+        td.textContent = 'No hay datos disponibles para esta vista.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
 
       datos.forEach(cols => {
         const fila = document.createElement('tr');
@@ -203,51 +220,60 @@
     const mostrarDespacho = () => mostrarFilas(datosDespacho);
     const mostrarRetorno = () => mostrarFilas(datosRetorno);
 
+    // Función helper para parsear CSV robusto (por comas)
+    function parseCSV(text) {
+      const filas = text.trim().split('\n');
+      return filas.map(fila => {
+        // Separar por coma, y limpiar espacios y comillas dobles
+        return fila.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+      });
+    }
+
     async function cargarDatos() {
       try {
-        // Cargar asignados.csv
+        // Asignados
         const responseAsignados = await fetch('asignado.csv');
         const dataAsignados = await responseAsignados.text();
         asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
+        console.log('Asignados:', asignados);
 
-        // Cargar viajes.csv
+        // Viajes
         const responseViajes = await fetch('viajes.csv');
         const dataViajes = await responseViajes.text();
-        const filasViajes = dataViajes.trim().split('\n');
-        filasViajes.shift(); // Quitar header
-        datosViajes = filasViajes.map(f => f.split(',').map(c => c.trim()));
+        let filasViajes = parseCSV(dataViajes);
+        filasViajes.shift(); // quitar header
+        datosViajes = filasViajes;
+        console.log('Viajes:', datosViajes.length);
 
-        // Cargar carga.csv
+        // Carga
         const responseCarga = await fetch('carga.csv');
         const dataCarga = await responseCarga.text();
-        const filasCarga = dataCarga.trim().split('\n');
+        let filasCarga = parseCSV(dataCarga);
         filasCarga.shift();
-        datosCarga = filasCarga.map(f => f.split(',').map(c => c.trim()));
+        datosCarga = filasCarga;
+        console.log('Carga:', datosCarga.length);
 
-        // Cargar despacho.csv
+        // Despacho
         const responseDespacho = await fetch('despacho.csv');
         const dataDespacho = await responseDespacho.text();
-        const filasDespacho = dataDespacho.trim().split('\n');
+        let filasDespacho = parseCSV(dataDespacho);
         filasDespacho.shift();
-        datosDespacho = filasDespacho.map(f => f.split(',').map(c => c.trim()));
+        datosDespacho = filasDespacho;
+        console.log('Despacho:', datosDespacho.length);
 
-        // Cargar retorno.csv y procesar
+        // Retorno
         const responseRetorno = await fetch('retorno.csv');
         const dataRetorno = await responseRetorno.text();
-        const filasRetorno = dataRetorno.trim().split('\n');
-        filasRetorno.shift(); // Quitar header
-
-        // Mapear retorno con columnas:
-        // Transporte, destino_geocerca, hora_programada, paso_por_chillan, ETA, ultima_actualizacion
-        datosRetorno = filasRetorno.map(fila => {
-          const cols = fila.split(','); // Cambia a '\t' si es TSV
-          const patente = cols[0].trim().toUpperCase();
-          const hora_programada = cols[2].trim();
-          const eta = cols[4] ? cols[4].trim() : '-';
-          const ultimaActualizacion = cols[5] ? cols[5].trim() : '-';
-          const semaforo = obtenerColorPorTiempos(hora_programada, eta);
-          return [patente, hora_programada, eta, semaforo, ultimaActualizacion];
+        let filasRetorno = parseCSV(dataRetorno);
+        filasRetorno.shift();
+        datosRetorno = filasRetorno.map(cols => {
+          const patente = cols[0].toUpperCase();
+          const hora_programada = cols[2];
+          const eta = cols[4] || '-';
+          const ultimaActualizacion = cols[5] || '-';
+          return [patente, hora_programada, eta, null, ultimaActualizacion];
         });
+        console.log('Retorno:', datosRetorno.length);
 
         crearBotonesFiltro();
         mostrarEncabezado();
@@ -259,7 +285,7 @@
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 10 * 60 * 1000); // Actualiza cada 10 minutos
+    setInterval(cargarDatos, 10 * 60 * 1000);
   </script>
 </body>
 </html>
