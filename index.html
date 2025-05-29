@@ -90,10 +90,10 @@
     actualizarReloj();
 
     function obtenerColorPorTiempos(programada, eta) {
-      if (!programada || !eta) return 'gray';
+      if (!programada || !eta || eta === '-' || programada === '-') return 'gray';
       const hProgramada = new Date(`1970-01-01T${programada}:00`);
       const hETA = new Date(`1970-01-01T${eta}:00`);
-      const diferencia = (hETA - hProgramada) / 60000; // minutos
+      const diferencia = (hETA - hProgramada) / 60000; // diferencia en minutos
 
       if (diferencia <= -10) return 'verde';
       if (diferencia <= 10) return 'amarillo';
@@ -147,7 +147,7 @@
             if (col === 'Hora Programada') valor = cols[1];
             if (col === 'ETA') valor = cols[2];
             if (col === 'Semáforo') td.className = obtenerColorPorTiempos(cols[1], cols[2]);
-            if (col === 'Última Actualización') { valor = cols[3]; td.className = 'fecha-actualizacion'; }
+            if (col === 'Última Actualización') { valor = cols[4]; td.className = 'fecha-actualizacion'; }
           }
 
           td.textContent = valor;
@@ -205,44 +205,61 @@
 
     async function cargarDatos() {
       try {
+        // Cargar asignados.csv
         const responseAsignados = await fetch('asignado.csv');
         const dataAsignados = await responseAsignados.text();
         asignados = dataAsignados.trim().split('\n').map(line => line.trim().toUpperCase());
 
+        // Cargar viajes.csv
         const responseViajes = await fetch('viajes.csv');
         const dataViajes = await responseViajes.text();
         const filasViajes = dataViajes.trim().split('\n');
-        filasViajes.shift();
+        filasViajes.shift(); // Quitar header
         datosViajes = filasViajes.map(f => f.split(',').map(c => c.trim()));
 
+        // Cargar carga.csv
         const responseCarga = await fetch('carga.csv');
         const dataCarga = await responseCarga.text();
         const filasCarga = dataCarga.trim().split('\n');
         filasCarga.shift();
         datosCarga = filasCarga.map(f => f.split(',').map(c => c.trim()));
 
+        // Cargar despacho.csv
         const responseDespacho = await fetch('despacho.csv');
         const dataDespacho = await responseDespacho.text();
         const filasDespacho = dataDespacho.trim().split('\n');
         filasDespacho.shift();
         datosDespacho = filasDespacho.map(f => f.split(',').map(c => c.trim()));
 
+        // Cargar retorno.csv y procesar
         const responseRetorno = await fetch('retorno.csv');
         const dataRetorno = await responseRetorno.text();
         const filasRetorno = dataRetorno.trim().split('\n');
-        filasRetorno.shift();
-        datosRetorno = filasRetorno.map(f => f.split(',').map(c => c.trim()));
+        filasRetorno.shift(); // Quitar header
+
+        // Mapear retorno con columnas:
+        // Transporte, destino_geocerca, hora_programada, paso_por_chillan, ETA, ultima_actualizacion
+        datosRetorno = filasRetorno.map(fila => {
+          const cols = fila.split(','); // Cambia a '\t' si es TSV
+          const patente = cols[0].trim().toUpperCase();
+          const hora_programada = cols[2].trim();
+          const eta = cols[4] ? cols[4].trim() : '-';
+          const ultimaActualizacion = cols[5] ? cols[5].trim() : '-';
+          const semaforo = obtenerColorPorTiempos(hora_programada, eta);
+          return [patente, hora_programada, eta, semaforo, ultimaActualizacion];
+        });
 
         crearBotonesFiltro();
         mostrarEncabezado();
         mostrarTodos();
+
       } catch (error) {
         console.error('Error cargando datos:', error);
       }
     }
 
     cargarDatos();
-    setInterval(cargarDatos, 10 * 60 * 1000);
+    setInterval(cargarDatos, 10 * 60 * 1000); // Actualiza cada 10 minutos
   </script>
 </body>
 </html>
